@@ -1,0 +1,5 @@
+{
+    "subdomain": "yapyap",
+    "type": "CNAME",
+    "target": "yapyapmodding.github.io"
+}
