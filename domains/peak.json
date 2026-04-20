@@ -1,0 +1,5 @@
+{
+    "subdomain": "peak",
+    "type": "CNAME",
+    "target": "peakmodding.github.io"
+}
