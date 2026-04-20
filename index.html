@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>modding-community.com - Subdomain Registry</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0d0d0f;
+      --surface: #141417;
+      --surface2: #1c1c21;
+      --border: #2a2a32;
+      --border-hover: #3d3d4a;
+      --text: #e8e8f0;
+      --muted: #6b6b80;
+      --accent: #7c6aff;
+      --accent-dim: rgba(124, 106, 255, 0.12);
+      --accent-border: rgba(124, 106, 255, 0.3);
+      --green: #3ecf8e;
+      --green-dim: rgba(62, 207, 142, 0.1);
+      --red: #f87171;
+      --mono: 'JetBrains Mono', monospace;
+      --sans: 'DM Sans', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      font-size: 15px;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(124,106,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(124,106,255,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .wrap {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 0 24px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* NAV */
+    nav {
+      border-bottom: 1px solid var(--border);
+      padding: 16px 0;
+      position: sticky;
+      top: 0;
+      background: rgba(13,13,15,0.92);
+      backdrop-filter: blur(12px);
+      z-index: 100;
+    }
+
+    nav .wrap {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-logo {
+      font-family: var(--mono);
+      font-size: 14px;
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    .nav-logo span { color: var(--accent); }
+
+    nav a.gh-link {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--muted);
+      text-decoration: none;
+      border: 1px solid var(--border);
+      padding: 6px 12px;
+      border-radius: 6px;
+      transition: border-color 0.2s, color 0.2s;
+    }
+
+    nav a.gh-link:hover { border-color: var(--border-hover); color: var(--text); }
+
+    nav a.gh-link svg { width: 14px; height: 14px; fill: currentColor; }
+
+    /* HERO */
+    .hero {
+      padding: 80px 0 60px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .hero-tag {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--accent);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .hero-tag::before {
+      content: '';
+      display: block;
+      width: 20px;
+      height: 1px;
+      background: var(--accent);
+    }
+
+    h1 {
+      font-family: var(--mono);
+      font-size: clamp(28px, 5vw, 42px);
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      margin-bottom: 20px;
+    }
+
+    h1 .dim { color: var(--muted); }
+    h1 .accent { color: var(--accent); }
+
+    .hero-desc {
+      color: var(--muted);
+      max-width: 520px;
+      font-size: 15px;
+      margin-bottom: 32px;
+      line-height: 1.7;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      border-radius: 7px;
+      font-family: var(--mono);
+      font-size: 13px;
+      font-weight: 500;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .btn-primary:hover { background: #9080ff; }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--border);
+    }
+
+    .btn-ghost:hover { border-color: var(--border-hover); color: var(--text); }
+
+    /* SECTIONS */
+    section { padding: 64px 0; border-bottom: 1px solid var(--border); }
+    section:last-child { border-bottom: none; }
+
+    .section-label {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 32px;
+    }
+
+    h2 {
+      font-family: var(--mono);
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      letter-spacing: -0.01em;
+    }
+
+    h3 {
+      font-family: var(--mono);
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: var(--text);
+    }
+
+    /* STEPS */
+    .steps {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .step {
+      display: grid;
+      grid-template-columns: 48px 1fr;
+      gap: 0 20px;
+      position: relative;
+    }
+
+    .step-left {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .step-num {
+      width: 36px;
+      height: 36px;
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--accent);
+      flex-shrink: 0;
+      background: var(--surface);
+      z-index: 1;
+    }
+
+    .step-line {
+      width: 1px;
+      flex: 1;
+      background: var(--border);
+      margin: 6px 0;
+    }
+
+    .step:last-child .step-line { display: none; }
+
+    .step-body {
+      padding-bottom: 32px;
+      padding-top: 6px;
+    }
+
+    .step:last-child .step-body { padding-bottom: 0; }
+
+    .step-body p { color: var(--muted); font-size: 14px; margin-top: 4px; }
+
+    .step-body a { color: var(--accent); text-decoration: none; }
+    .step-body a:hover { text-decoration: underline; }
+
+    .code-block {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px 20px;
+      font-family: var(--mono);
+      font-size: 12.5px;
+      color: #c9c9e0;
+      margin-top: 14px;
+      line-height: 1.7;
+      overflow-x: auto;
+    }
+
+    .code-block .k { color: var(--accent); }
+    .code-block .s { color: var(--green); }
+    .code-block .c { color: var(--muted); }
+
+    .rules-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    @media (max-width: 600px) { .rules-grid { grid-template-columns: 1fr; } }
+
+    .rule-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 18px 20px;
+    }
+
+    .rule-card h3 {
+      font-size: 13px;
+      margin-bottom: 6px;
+    }
+
+    .rule-card p {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .builder {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .builder-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .builder-header span {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .dot { width: 8px; height: 8px; border-radius: 50%; }
+    .dot-r { background: #f87171; }
+    .dot-y { background: #fbbf24; }
+    .dot-g { background: #3ecf8e; }
+
+    .builder-body { padding: 24px; }
+
+    .field { margin-bottom: 20px; }
+
+    .field label {
+      display: block;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 8px;
+    }
+
+    .field-row {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      transition: border-color 0.2s;
+    }
+
+    .field-row:focus-within { border-color: var(--accent-border); }
+
+    .field-prefix {
+      font-family: var(--mono);
+      font-size: 13px;
+      color: var(--muted);
+      padding: 10px 12px;
+      border-right: 1px solid var(--border);
+      white-space: nowrap;
+      user-select: none;
+    }
+
+    .field-suffix {
+      font-family: var(--mono);
+      font-size: 13px;
+      color: var(--muted);
+      padding: 10px 12px;
+      border-left: 1px solid var(--border);
+      white-space: nowrap;
+      user-select: none;
+    }
+
+    input, select {
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 13px;
+      padding: 10px 12px;
+      width: 100%;
+      min-width: 0;
+    }
+
+    select {
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b6b80' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 32px;
+    }
+
+    select option { background: var(--surface2); }
+
+    /* Preview */
+    .preview-label {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 10px;
+    }
+
+    .preview-box {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px 20px;
+      font-family: var(--mono);
+      font-size: 13px;
+      line-height: 1.8;
+      color: #c9c9e0;
+      position: relative;
+      min-height: 100px;
+      transition: border-color 0.2s;
+    }
+
+    .preview-box.valid { border-color: rgba(62, 207, 142, 0.3); }
+    .preview-box.invalid { border-color: rgba(248, 113, 113, 0.3); }
+
+    .preview-box .pk { color: var(--muted); }
+    .preview-box .pv-str { color: var(--green); }
+    .preview-box .pv-key { color: var(--accent); }
+
+    .preview-placeholder { color: var(--muted); font-size: 12px; }
+
+    .builder-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+
+    .btn-download {
+      background: var(--green-dim);
+      color: var(--green);
+      border: 1px solid rgba(62, 207, 142, 0.25);
+      padding: 10px 18px;
+    }
+
+    .btn-download:hover { background: rgba(62, 207, 142, 0.18); }
+
+    .btn-download:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+
+    .validation-msg {
+      font-family: var(--mono);
+      font-size: 11px;
+      margin-top: 10px;
+      min-height: 16px;
+    }
+
+    .validation-msg.ok { color: var(--green); }
+    .validation-msg.err { color: var(--red); }
+
+    .tabs { display: flex; gap: 4px; margin-bottom: 20px; flex-wrap: wrap; }
+
+    .tab {
+      font-family: var(--mono);
+      font-size: 12px;
+      padding: 7px 14px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .tab.active {
+      background: var(--accent-dim);
+      border-color: var(--accent-border);
+      color: var(--accent);
+    }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    .tab-content p { color: var(--muted); font-size: 14px; margin-bottom: 12px; line-height: 1.7; }
+
+    .tab-content ol {
+      padding-left: 20px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.8;
+    }
+
+    .tab-content ol li { margin-bottom: 4px; }
+
+    /* FOOTER */
+    footer {
+      padding: 32px 0;
+      border-top: 1px solid var(--border);
+    }
+
+    footer .wrap {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    footer p { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+    footer a { color: var(--accent); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-family: var(--mono);
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      background: var(--accent-dim);
+      color: var(--accent);
+      border: 1px solid var(--accent-border);
+    }
+
+    /* Copied toast */
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--green);
+      font-family: var(--mono);
+      font-size: 12px;
+      padding: 10px 16px;
+      border-radius: 7px;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: all 0.2s;
+      z-index: 999;
+      pointer-events: none;
+    }
+
+    #toast.show { opacity: 1; transform: translateY(0); }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a class="nav-logo" href="#"><span>*.</span>modding-community.com</a>
+    <a class="gh-link" href="https://github.com/modding-community-com/register" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+      GitHub
+    </a>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="wrap">
+    <div class="hero-tag">Free subdomains</div>
+    <h1>
+      <span class="dim">your-mod.</span><br>
+      <span class="accent">modding-community</span><span class="dim">.com</span>
+    </h1>
+    <p class="hero-desc">
+      Get a free subdomain for your modding project. Fork the repo, drop a JSON file, open a PR. That's it.
+    </p>
+    <div class="hero-actions">
+      <a class="btn btn-primary" href="https://github.com/modding-community-com/register/fork" target="_blank" rel="noopener">
+        Fork &amp; Register
+      </a>
+      <a class="btn btn-ghost" href="#builder">Build your JSON ↓</a>
+    </div>
+  </div>
+</div>
+
+<section>
+  <div class="wrap">
+    <div class="section-label">How it works</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-left"><div class="step-num">1</div><div class="step-line"></div></div>
+        <div class="step-body">
+          <h3>Fork the repo</h3>
+          <p>Head to <a href="https://github.com/modding-community-com/register" target="_blank" rel="noopener">github.com/modding-community-com/register</a> and fork it to your account.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-left"><div class="step-num">2</div><div class="step-line"></div></div>
+        <div class="step-body">
+          <h3>Create your JSON file</h3>
+          <p>Add a file to the <code style="font-family:var(--mono);color:var(--accent)">domains/</code> folder. The filename must match your subdomain exactly - <code style="font-family:var(--mono);color:var(--accent)">cool-mod.json</code> for <code style="font-family:var(--mono);color:var(--accent)">cool-mod.modding-community.com</code>. Use the builder below.</p>
+          <div class="code-block">
+            <span class="c">// domains/cool-mod.json</span>
+            {
+            <span class="k">"subdomain"</span>: <span class="s">"cool-mod"</span>,
+            <span class="k">"type"</span>: <span class="s">"CNAME"</span>,
+            <span class="k">"target"</span>: <span class="s">"your-username.github.io"</span>
+            }
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-left"><div class="step-num">3</div><div class="step-line"></div></div>
+        <div class="step-body">
+          <h3>Open a Pull Request</h3>
+          <p>Submit a PR from your fork to the <code style="font-family:var(--mono);color:var(--accent)">main</code> branch. Automated checks will run. A maintainer reviews and merges.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-left"><div class="step-num">4</div><div class="step-line"></div></div>
+        <div class="step-body">
+          <h3>You're live</h3>
+          <p>DNS goes active within minutes of the merge. Then configure your hosting provider to accept traffic from your new subdomain.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="builder">
+  <div class="wrap">
+    <div class="section-label">JSON builder</div>
+    <p style="color:var(--muted);font-size:14px;margin-bottom:28px;">Fill in the fields, download the file, drop it in <code style="font-family:var(--mono);color:var(--accent)">domains/</code> in your fork.</p>
+
+    <div class="builder">
+      <div class="builder-header">
+        <div class="dot dot-r"></div>
+        <div class="dot dot-y"></div>
+        <div class="dot dot-g"></div>
+        <span style="margin-left:8px;">domains/<span id="file-label">your-subdomain.json</span></span>
+      </div>
+      <div class="builder-body">
+        <div class="field">
+          <label>Subdomain</label>
+          <div class="field-row">
+            <input type="text" id="inp-subdomain" placeholder="cool-mod" autocomplete="off" spellcheck="false">
+            <span class="field-suffix">.modding-community.com</span>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Type</label>
+          <div class="field-row">
+            <select id="inp-type">
+              <option value="CNAME">CNAME - hostname target (GitHub Pages, Vercel, Netlify…)</option>
+              <option value="A">A - IPv4 address (self-hosted)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Target</label>
+          <div class="field-row">
+            <input type="text" id="inp-target" placeholder="your-username.github.io" autocomplete="off" spellcheck="false">
+          </div>
+        </div>
+
+        <div class="preview-label">Preview</div>
+        <div class="preview-box" id="preview">
+          <span class="preview-placeholder">Fill in the fields above…</span>
+        </div>
+        <div class="validation-msg" id="val-msg"></div>
+
+        <div class="builder-actions">
+          <button class="btn btn-download" id="btn-download" disabled onclick="downloadJSON()">
+            ↓ Download JSON
+          </button>
+          <button class="btn btn-ghost" onclick="copyJSON()">Copy to clipboard</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="section-label">Rules</div>
+    <p style="color:var(--muted);font-size:14px;margin-bottom:24px;">Check the <a href="https://github.com/modding-community-com/register#readme" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:none">repo README</a> for the full details - this is just a quick summary.</p>
+    <div class="rules-grid">
+      <div class="rule-card">
+        <h3>One subdomain per target</h3>
+        <p>Each target URL or IP can only map to one subdomain. No duplicate entries.</p>
+      </div>
+      <div class="rule-card">
+        <h3>Filename = subdomain</h3>
+        <p>The JSON filename must exactly match the subdomain value inside it.</p>
+      </div>
+      <div class="rule-card">
+        <h3>Manual review</h3>
+        <p>All PRs are reviewed by a maintainer. Offensive or impersonating names get rejected.</p>
+      </div>
+      <div class="rule-card">
+        <h3>Keep it active</h3>
+        <p>Subdomains pointing to dead or empty sites may be removed to free up names.</p>
+      </div>
+    </div>
+    <p style="color:var(--muted);font-size:13px;margin-top:16px;">
+      To report a subdomain: DM <span style="font-family:var(--mono);color:var(--accent)">@atomictyler</span> on Discord. To update or delete your subdomain, edit or remove your JSON file and open a new PR.
+    </p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="section-label">Hosting setup</div>
+    <p style="color:var(--muted);font-size:14px;margin-bottom:24px;">After your PR is merged, tell your host about the new domain. Full instructions in the <a href="https://github.com/modding-community-com/register#readme" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:none">README</a>.</p>
+
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('github')">GitHub Pages</button>
+      <button class="tab" onclick="switchTab('vercel')">Vercel / Netlify</button>
+      <button class="tab" onclick="switchTab('self')">Self-hosted</button>
+    </div>
+
+    <div class="tab-content active" id="tab-github">
+      <ol>
+        <li>Go to your repo → <strong>Settings</strong> → <strong>Pages</strong></li>
+        <li>Under <strong>Custom Domain</strong>, enter <code style="font-family:var(--mono);color:var(--accent)">your-subdomain.modding-community.com</code></li>
+        <li>Click <strong>Save</strong>. GitHub verifies the DNS and issues an SSL cert automatically.</li>
+      </ol>
+    </div>
+
+    <div class="tab-content" id="tab-vercel">
+      <ol>
+        <li>Open your project dashboard on Vercel or Netlify</li>
+        <li>Find <strong>Domain Settings</strong> or <strong>Custom Domains</strong></li>
+        <li>Add <code style="font-family:var(--mono);color:var(--accent)">your-subdomain.modding-community.com</code></li>
+        <li>The provider detects the CNAME automatically - no extra DNS step needed.</li>
+      </ol>
+    </div>
+
+    <div class="tab-content" id="tab-self">
+      <p>Use type <code style="font-family:var(--mono);color:var(--accent)">A</code> in your JSON with your server's public IPv4 as the target. Then configure your web server (Nginx, Apache, Caddy…) to handle the hostname <code style="font-family:var(--mono);color:var(--accent)">your-subdomain.modding-community.com</code>.</p>
+      <div class="code-block">
+<span class="c">// domains/my-server.json</span>
+{
+  <span class="k">"subdomain"</span>: <span class="s">"my-server"</span>,
+  <span class="k">"type"</span>: <span class="s">"A"</span>,
+  <span class="k">"target"</span>: <span class="s">"123.456.789.0"</span>
+}
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p>
+      <a href="https://github.com/modding-community-com/register" target="_blank" rel="noopener">github.com/modding-community-com/register</a>
+    </p>
+    <p>
+      <span class="badge">free &amp; open</span>
+    </p>
+  </div>
+</footer>
+
+<div id="toast">Copied to clipboard</div>
+
+<script>
+  const inpSubdomain = document.getElementById('inp-subdomain');
+  const inpType = document.getElementById('inp-type');
+  const inpTarget = document.getElementById('inp-target');
+  const preview = document.getElementById('preview');
+  const valMsg = document.getElementById('val-msg');
+  const btnDownload = document.getElementById('btn-download');
+  const fileLabel = document.getElementById('file-label');
+
+  function getValues() {
+    return {
+      subdomain: inpSubdomain.value.trim(),
+      type: inpType.value,
+      target: inpTarget.value.trim()
+    };
+  }
+
+  function validate({ subdomain, type, target }) {
+    if (!subdomain) return { ok: false, msg: '' };
+    if (!/^[a-z0-9]([a-z0-9-]*[a-z0-9])?$/.test(subdomain))
+      return { ok: false, msg: '✗ Subdomain can only contain lowercase letters, numbers, and hyphens.' };
+    if (!target) return { ok: false, msg: '' };
+    if (type === 'A') {
+      const ipv4 = /^(\d{1,3}\.){3}\d{1,3}$/;
+      if (!ipv4.test(target)) return { ok: false, msg: '✗ A record target must be a valid IPv4 address.' };
+    }
+    return { ok: true, msg: '✓ Looks good' };
+  }
+
+  function update() {
+    const v = getValues();
+    const result = validate(v);
+
+    fileLabel.textContent = v.subdomain ? `${v.subdomain}.json` : 'your-subdomain.json';
+
+    if (!v.subdomain && !v.target) {
+      preview.innerHTML = '<span class="preview-placeholder">Fill in the fields above…</span>';
+      preview.className = 'preview-box';
+      valMsg.textContent = '';
+      valMsg.className = 'validation-msg';
+      btnDownload.disabled = true;
+      return;
+    }
+
+    const json = {
+      subdomain: v.subdomain || '',
+      type: v.type,
+      target: v.target || ''
+    };
+
+    preview.innerHTML =
+            `<span class="pk">{</span>\n` +
+            `    <span class="pk">"subdomain"</span>: <span class="pv-str">"${escHtml(json.subdomain)}"</span>,\n` +
+            `    <span class="pk">"type"</span>: <span class="pv-key">"${escHtml(json.type)}"</span>,\n` +
+            `    <span class="pk">"target"</span>: <span class="pv-str">"${escHtml(json.target)}"</span>\n` +
+            `<span class="pk">}</span>`;
+
+    preview.className = 'preview-box ' + (result.ok ? 'valid' : (result.msg ? 'invalid' : ''));
+    valMsg.textContent = result.msg;
+    valMsg.className = 'validation-msg ' + (result.ok ? 'ok' : 'err');
+    btnDownload.disabled = !result.ok;
+  }
+
+  function escHtml(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function buildJSON() {
+    const v = getValues();
+    return JSON.stringify({ subdomain: v.subdomain, type: v.type, target: v.target }, null, 4);
+  }
+
+  function downloadJSON() {
+    const v = getValues();
+    const blob = new Blob([buildJSON()], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `${v.subdomain}.json`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+
+  function copyJSON() {
+    navigator.clipboard.writeText(buildJSON()).then(() => {
+      const t = document.getElementById('toast');
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2000);
+    });
+  }
+
+  function switchTab(name) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    event.target.classList.add('active');
+  }
+
+  [inpSubdomain, inpType, inpTarget].forEach(el => el.addEventListener('input', update));
+  update();
+
+  inpType.addEventListener('change', () => {
+    inpTarget.placeholder = inpType.value === 'A' ? '123.456.789.0' : 'your-username.github.io';
+    update();
+  });
+</script>
+</body>
+</html>
