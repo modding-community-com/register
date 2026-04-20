@@ -1,0 +1,75 @@
+name: Register Subdomain
+on:
+  push:
+    branches: [ main ]
+    paths: [ 'domains/*.json' ]
+
+jobs:
+  update-dns:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Parse and Create Record
+        env:
+          CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
+        run: |
+          # --diff-filter=AMD captures Added, Modified, and Deleted files
+          FILES=$(git diff --name-status HEAD^ HEAD | grep 'domains/.*.json')
+
+          echo "Processing changes..."
+
+          echo "$FILES" | while read -r line; do
+              STATUS=$(echo $line | awk '{print $1}')
+              FILE_PATH=$(echo $line | awk '{print $2}')
+              
+              SUBDOMAIN_NAME=$(basename "$FILE_PATH" .json)
+              FULL_DOMAIN="$SUBDOMAIN_NAME.modding-community.com"
+
+              echo "Target: $FULL_DOMAIN | Action: $STATUS"
+
+              RECORD_ID=$(curl -s -X GET "https://api.cloudflare.com/client/v4/zones/$CF_ZONE_ID/dns_records?name=$FULL_DOMAIN" \
+                  -H "Authorization: Bearer $CF_API_TOKEN" \
+                  | jq -r '.result[0].id // empty')
+
+              case $STATUS in
+                D)
+                  if [ ! -z "$RECORD_ID" ]; then
+                      echo "Deleting $FULL_DOMAIN..."
+                      curl -s -X DELETE "https://api.cloudflare.com/client/v4/zones/$CF_ZONE_ID/dns_records/$RECORD_ID" \
+                          -H "Authorization: Bearer $CF_API_TOKEN"
+                  fi
+                  ;;
+                
+                M)
+                  if [ ! -z "$RECORD_ID" ]; then
+                      echo "Updating $FULL_DOMAIN..."
+                      TARGET=$(jq -r '.target' "$FILE_PATH")
+                      TYPE=$(jq -r '.type' "$FILE_PATH")
+                      curl -s -X PUT "https://api.cloudflare.com/client/v4/zones/$CF_ZONE_ID/dns_records/$RECORD_ID" \
+                          -H "Authorization: Bearer $CF_API_TOKEN" \
+                          -H "Content-Type: application/json" \
+                          --data "{\"type\":\"$TYPE\",\"name\":\"$SUBDOMAIN_NAME\",\"content\":\"$TARGET\",\"ttl\":3600,\"proxied\":true}"
+                  else
+                      echo "Record ID not found for $FULL_DOMAIN, attempting to create instead."
+                      STATUS="A" # Fallback to create if update fails
+                  fi
+                  ;;
+
+                A)
+                  echo "Creating $FULL_DOMAIN..."
+                  TARGET=$(jq -r '.target' "$FILE_PATH")
+                  TYPE=$(jq -r '.type' "$FILE_PATH")
+                  curl -s -X POST "https://api.cloudflare.com/client/v4/zones/$CF_ZONE_ID/dns_records" \
+                      -H "Authorization: Bearer $CF_API_TOKEN" \
+                      -H "Content-Type: application/json" \
+                      --data "{\"type\":\"$TYPE\",\"name\":\"$SUBDOMAIN_NAME\",\"content\":\"$TARGET\",\"ttl\":3600,\"proxied\":true}"
+                  ;;
+              esac
+
+              sleep 0.5
+          done
