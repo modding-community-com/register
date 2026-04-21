@@ -222,9 +222,9 @@
     <section id="section-browse" class="page-section active">
         <div class="controls-row">
             <input type="text" id="searchBar" class="search-bar" placeholder="Search by name or subdomain..." oninput="filterCommunities()">
-            <button class="refresh-btn" onclick="fetchRegistry(true)" title="Force Refresh Data">↻</button>
+            <button class="refresh-btn" onclick="fetchRegistry()" title="Refresh List">↻</button>
         </div>
-        <div id="loading" style="text-align: center; color: var(--accent); padding: 20px;">Fetching registry...</div>
+        <div id="loading" style="text-align: center; color: var(--accent); padding: 20px;">Loading...</div>
         <div class="community-grid" id="community-grid"></div>
     </section>
 
@@ -265,12 +265,11 @@
         <div class="step-box">
             <h4>Instructions: What to do with this file</h4>
             <ol>
-                <li>Fork the <a href="https://github.com/modding-community-com/register" target="_blank">Registry Repository</a>.</li>
+                <li>Fork the <a href="https://github.com/modding-community-com/register" target="_blank" style="color:var(--accent)">Registry Repository</a>.</li>
                 <li>Navigate to the <code>domains/</code> folder in your fork.</li>
                 <li>Upload your <code>.json</code> file (or create a new file and paste the copied code).</li>
-                <li>Upload an icon that is 360x480px and the same name as the subdomain, this is not required but recommended for the browser!</li>
+                <li>Upload an icon to the <code>icons/</code> folder. Use 360x480px and the same name as the subdomain.</li>
                 <li>Submit a <strong>Pull Request</strong> back to the main repository.</li>
-                <li>Wait for approval! Once merged, your subdomain will go live within minutes.</li>
             </ol>
         </div>
     </section>
@@ -280,11 +279,6 @@
     </footer>
 
     <script>
-        const REPO_OWNER = 'modding-community-com';
-        const REPO_NAME = 'register';
-        const CACHE_KEY = 'modding_registry_cache';
-        const CACHE_TIME = 3 * 60 * 60 * 1000; 
-
         let allCommunities = [];
 
         function switchTab(tab) {
@@ -300,43 +294,31 @@
             }
         }
 
-        async function fetchRegistry(force = false) {
-            const now = Date.now();
-            const cached = localStorage.getItem(CACHE_KEY);
-            
-            if (!force && cached) {
-                const parsed = JSON.parse(cached);
-                if (now - parsed.timestamp < CACHE_TIME) {
-                    allCommunities = parsed.data;
-                    renderCommunities(allCommunities);
-                    return;
-                }
-            }
-
+        async function fetchRegistry() {
             document.getElementById('loading').style.display = 'block';
-            document.getElementById('loading').textContent = "Syncing with GitHub...";
+            const grid = document.getElementById('community-grid');
+            grid.innerHTML = '';
 
             try {
-                const response = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/domains`);
-                const files = await response.json();
+                const response = await fetch('domains/');
+                const text = await response.text();
                 
-                const fetchPromises = files
-                    .filter(f => f.name.endsWith('.json'))
-                    .map(async f => {
-                        const res = await fetch(f.download_url);
-                        return await res.json();
-                    });
+                const parser = new DOMParser();
+                const htmlDoc = parser.parseFromString(text, 'text/html');
+                const links = Array.from(htmlDoc.querySelectorAll('a'))
+                                   .map(a => a.getAttribute('href'))
+                                   .filter(href => href && href.endsWith('.json'));
+
+                const fetchPromises = links.map(async file => {
+                    const path = file;
+                    const res = await fetch(path);
+                    return await res.json();
+                });
 
                 allCommunities = await Promise.all(fetchPromises);
-                
-                localStorage.setItem(CACHE_KEY, JSON.stringify({
-                    timestamp: now,
-                    data: allCommunities
-                }));
-
                 renderCommunities(allCommunities);
             } catch (e) {
-                document.getElementById('loading').textContent = "Error loading registry. GitHub rate limit might be exceeded.";
+                document.getElementById('loading').textContent = "Error loading files.";
             }
         }
 
@@ -346,7 +328,6 @@
             grid.innerHTML = '';
 
             list.forEach(item => {
-                // Use inner subdomain field for link and icon
                 const sub = item.subdomain;
                 const display = item.display || sub;
 
@@ -360,7 +341,7 @@
                 
                 const img = document.createElement('img');
                 img.className = 'community-icon';
-                const iconBase = `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/main/icons/${sub}`;
+                const iconBase = `icons/${sub}`;
                 const exts = ['.webp', '.png', '.jpg', '.jpeg'];
                 let eIdx = 0;
 
