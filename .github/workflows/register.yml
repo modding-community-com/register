@@ -39,7 +39,6 @@ jobs:
               PAGE_RULE_ID=$(curl -s -X GET "https://api.cloudflare.com/client/v4/zones/$CF_ZONE_ID/pagerules?status=active" \
                   -H "Authorization: Bearer $CF_API_TOKEN" | jq -r ".result[] | select(.targets[].constraint.value == \"$FULL_DOMAIN/*\") | .id" | head -n 1)
 
-              # 2. DELETE EXISTING (Cleanup for both M and D status to handle type-swapping)
               if [ ! -z "$DNS_RECORD_ID" ]; then
                   echo "Removing existing DNS record..."
                   curl -s -X DELETE "https://api.cloudflare.com/client/v4/zones/$CF_ZONE_ID/dns_records/$DNS_RECORD_ID" -H "Authorization: Bearer $CF_API_TOKEN"
@@ -55,7 +54,6 @@ jobs:
 
                   if [ "$TYPE" == "REDIRECT" ]; then
                       echo "Creating Redirect Page Rule for $FULL_DOMAIN -> $TARGET"
-                      # We need a 'dummy' DNS record for Page Rules to trigger (proxied)
                       curl -s -X POST "https://api.cloudflare.com/client/v4/zones/$CF_ZONE_ID/dns_records" \
                           -H "Authorization: Bearer $CF_API_TOKEN" \
                           -H "Content-Type: application/json" \
