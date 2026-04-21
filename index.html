@@ -29,7 +29,7 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
             line-height: 1.6;
             color: var(--text);
-            max-width: 800px;
+            max-width: 1000px;
             margin: 0 auto;
             padding: 40px 20px;
             background: var(--bg);
@@ -39,204 +39,378 @@
 
         .cog-container {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            pointer-events: none;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1; pointer-events: none;
         }
 
-        .cog {
-            position: absolute;
-            fill: var(--cog-color);
-        }
-
-        .cog-1 {
-            width: 500px;
-            height: 500px;
-            top: -100px;
-            left: -150px;
-            animation: rotate 80s linear infinite;
-        }
-
-        .cog-2 {
-            width: 350px;
-            height: 350px;
-            bottom: -50px;
-            right: -100px;
-            animation: rotate 50s linear infinite reverse;
-        }
+        .cog { position: absolute; fill: var(--cog-color); }
+        .cog-1 { width: 500px; height: 500px; top: -100px; left: -150px; animation: rotate 80s linear infinite; }
+        .cog-2 { width: 350px; height: 350px; bottom: -50px; right: -100px; animation: rotate 50s linear infinite reverse; }
 
         header {
             border-bottom: 2px solid var(--border);
             padding-bottom: 25px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        h1 { margin: 0; font-size: 2.2rem; color: #fff; text-shadow: 0 0 10px var(--accent-glow); }
+        
+        .nav-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
             margin-bottom: 40px;
         }
 
-        h1 { margin: 0; font-size: 1.8rem; color: #fff; text-shadow: 0 0 10px var(--accent-glow); }
-        h2 { font-size: 1.3rem; margin-top: 50px; color: #fff; font-weight: 600; }
-        
-        a { color: var(--accent); text-decoration: none; transition: color 0.2s; }
-        a:hover { color: var(--accent-hover); text-decoration: underline; }
+        .nav-btn {
+            background: var(--input-bg);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 10px 30px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+        .nav-btn.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
+
+        .controls-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .search-bar {
+            flex-grow: 1;
+            padding: 15px;
+            font-size: 1rem;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: var(--input-bg);
+            color: white;
+        }
+
+        .refresh-btn {
+            background: var(--input-bg);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 0 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .refresh-btn:hover { background: var(--border); }
+
+        .community-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 20px;
+        }
+
+        .community-card {
+            background: var(--box-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            text-decoration: none !important;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .community-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+        }
+
+        .community-icon-wrapper {
+            width: 100%;
+            aspect-ratio: 360 / 480;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .community-icon { width: 100%; height: 100%; object-fit: cover; }
+        .icon-fallback { font-size: 80px; color: var(--border); font-weight: bold; }
+
+        .community-info { padding: 15px; text-align: center; }
+        .community-display-name { color: #fff; font-weight: bold; font-size: 1.1rem; display: block; margin-bottom: 4px; }
+        .community-subdomain { color: var(--accent); font-size: 0.8rem; font-family: monospace; }
+
+        .page-section { display: none; }
+        .page-section.active { display: block; }
 
         .creator-box {
             border: 1px solid var(--border);
             padding: 25px;
             border-radius: 8px;
             background: var(--box-bg);
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
         }
 
         .form-group { margin-bottom: 20px; }
         label { display: block; font-weight: bold; margin-bottom: 8px; font-size: 0.9rem; color: #a0a0c0; }
         
         input, select {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            box-sizing: border-box;
-            font-family: monospace;
-            background-color: var(--input-bg);
-            color: var(--text);
-            transition: all 0.2s;
-        }
-        
-        input:focus, select:focus {
-            outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 8px var(--accent-glow);
+            width: 100%; padding: 12px; border: 1px solid var(--border);
+            border-radius: 6px; box-sizing: border-box; font-family: monospace;
+            background-color: var(--input-bg); color: var(--text);
         }
 
         .output-area {
-            margin-top: 25px;
-            background: var(--code-bg);
+            margin-top: 25px; background: var(--code-bg); padding: 20px;
+            border-radius: 6px; border: 1px solid var(--border);
+        }
+
+        pre { margin: 0; font-size: 0.9rem; color: #d7bdf2; font-family: 'Consolas', monospace; overflow-x: auto; }
+
+        .button-group { display: flex; gap: 10px; margin-top: 15px; }
+
+        .action-btn {
+            background: var(--accent); color: white; border: none; padding: 15px;
+            border-radius: 6px; cursor: pointer; font-weight: bold; flex: 1;
+            transition: opacity 0.2s;
+        }
+        
+        .action-btn.secondary { background: var(--border); color: var(--text); }
+        .action-btn:hover { opacity: 0.9; }
+
+        .step-box {
+            background: var(--rules-bg);
             padding: 20px;
-            border-radius: 6px;
+            border-radius: 8px;
+            margin-top: 30px;
             border: 1px solid var(--border);
         }
 
-        pre { margin: 0; font-size: 0.9rem; overflow-x: auto; color: #d7bdf2; font-family: 'Consolas', monospace; }
-
-        button {
-            background: var(--accent);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 1rem;
-            margin-top: 15px;
-            transition: all 0.2s;
-        }
-
-        button:hover { 
-            background: var(--accent-hover); 
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px var(--accent-glow);
-        }
-
-        .rules {
-            font-size: 0.95rem;
-            background: var(--rules-bg);
-            padding: 20px;
-            border-left: 4px solid var(--rules-border);
-            margin-bottom: 30px;
-            border-radius: 6px;
-        }
-
-        code {
-            background: rgba(163, 77, 242, 0.2);
-            color: #e9d5ff;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-family: monospace;
-        }
+        .step-box h4 { margin: 0 0 10px 0; color: #fff; }
+        .step-box ol { padding-left: 20px; margin-bottom: 0; color: #b0b0cf; }
+        .step-box li { margin-bottom: 8px; }
 
         footer {
-            margin-top: 80px;
-            font-size: 0.85rem;
-            color: #666;
-            border-top: 1px solid var(--border);
-            padding-top: 30px;
-            text-align: center;
+            margin-top: 80px; font-size: 0.85rem; color: #666;
+            border-top: 1px solid var(--border); padding-top: 30px; text-align: center;
         }
     </style>
 </head>
 <body>
 
     <div class="cog-container">
-        <svg class="cog cog-1" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
-            <path fill-rule="evenodd" clip-rule="evenodd" d="M6.50001 0H9.50001L10.0939 2.37548C10.7276 2.6115 11.3107 2.95155 11.8223 3.37488L14.1782 2.70096L15.6782 5.29904L13.9173 7.00166C13.9717 7.32634 14 7.65987 14 8C14 8.34013 13.9717 8.67366 13.9173 8.99834L15.6782 10.701L14.1782 13.299L11.8223 12.6251C11.3107 13.0484 10.7276 13.3885 10.0939 13.6245L9.50001 16H6.50001L5.90614 13.6245C5.27242 13.3885 4.68934 13.0484 4.17768 12.6251L1.82181 13.299L0.321808 10.701L2.08269 8.99834C2.02831 8.67366 2.00001 8.34013 2.00001 8C2.00001 7.65987 2.02831 7.32634 2.08269 7.00166L0.321808 5.29904L1.82181 2.70096L4.17768 3.37488C4.68934 2.95155 5.27241 2.6115 5.90614 2.37548L6.50001 0ZM8.00001 10C9.10458 10 10 9.10457 10 8C10 6.89543 9.10458 6 8.00001 6C6.89544 6 6.00001 6.89543 6.00001 8C6.00001 9.10457 6.89544 10 8.00001 10Z" />
-        </svg>
-        <svg class="cog cog-2" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
-            <path fill-rule="evenodd" clip-rule="evenodd" d="M6.50001 0H9.50001L10.0939 2.37548C10.7276 2.6115 11.3107 2.95155 11.8223 3.37488L14.1782 2.70096L15.6782 5.29904L13.9173 7.00166C13.9717 7.32634 14 7.65987 14 8C14 8.34013 13.9717 8.67366 13.9173 8.99834L15.6782 10.701L14.1782 13.299L11.8223 12.6251C11.3107 13.0484 10.7276 13.3885 10.0939 13.6245L9.50001 16H6.50001L5.90614 13.6245C5.27242 13.3885 4.68934 13.0484 4.17768 12.6251L1.82181 13.299L0.321808 10.701L2.08269 8.99834C2.02831 8.67366 2.00001 8.34013 2.00001 8C2.00001 7.65987 2.02831 7.32634 2.08269 7.00166L0.321808 5.29904L1.82181 2.70096L4.17768 3.37488C4.68934 2.95155 5.27241 2.6115 5.90614 2.37548L6.50001 0ZM8.00001 10C9.10458 10 10 9.10457 10 8C10 6.89543 9.10458 6 8.00001 6C6.89544 6 6.00001 6.89543 6.00001 8C6.00001 9.10457 6.89544 10 8.00001 10Z" />
-        </svg>
+        <svg class="cog cog-1" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path d="M6.50001 0H9.50001L10.0939 2.37548C10.7276 2.6115 11.3107 2.95155 11.8223 3.37488L14.1782 2.70096L15.6782 5.29904L13.9173 7.00166C13.9717 7.32634 14 7.65987 14 8C14 8.34013 13.9717 8.67366 13.9173 8.99834L15.6782 10.701L14.1782 13.299L11.8223 12.6251C11.3107 13.0484 10.7276 13.3885 10.0939 13.6245L9.50001 16H6.50001L5.90614 13.6245C5.27242 13.3885 4.68934 13.0484 4.17768 12.6251L1.82181 13.299L0.321808 10.701L2.08269 8.99834C2.02831 8.67366 2.00001 8.34013 2.00001 8C2.00001 7.65987 2.02831 7.32634 2.08269 7.00166L0.321808 5.29904L1.82181 2.70096L4.17768 3.37488C4.68934 2.95155 5.27241 2.6115 5.90614 2.37548L6.50001 0ZM8.00001 10C9.10458 10 10 9.10457 10 8C10 6.89543 9.10458 6 8.00001 6C6.89544 6 6.00001 6.89543 6.00001 8C6.00001 9.10457 6.89544 10 8.00001 10Z" /></svg>
+        <svg class="cog cog-2" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path d="M6.50001 0H9.50001L10.0939 2.37548C10.7276 2.6115 11.3107 2.95155 11.8223 3.37488L14.1782 2.70096L15.6782 5.29904L13.9173 7.00166C13.9717 7.32634 14 7.65987 14 8C14 8.34013 13.9717 8.67366 13.9173 8.99834L15.6782 10.701L14.1782 13.299L11.8223 12.6251C11.3107 13.0484 10.7276 13.3885 10.0939 13.6245L9.50001 16H6.50001L5.90614 13.6245C5.27242 13.3885 4.68934 13.0484 4.17768 12.6251L1.82181 13.299L0.321808 10.701L2.08269 8.99834C2.02831 8.67366 2.00001 8.34013 2.00001 8C2.00001 7.65987 2.02831 7.32634 2.08269 7.00166L0.321808 5.29904L1.82181 2.70096L4.17768 3.37488C4.68934 2.95155 5.27241 2.6115 5.90614 2.37548L6.50001 0ZM8.00001 10C9.10458 10 10 9.10457 10 8C10 6.89543 9.10458 6 8.00001 6C6.89544 6 6.00001 6.89543 6.00001 8C6.00001 9.10457 6.89544 10 8.00001 10Z" /></svg>
     </div>
 
     <header>
         <h1>*.modding-community.com</h1>
-        <p>Custom subdomains for your modding projects.</p>
     </header>
 
-    <section class="rules">
-        <strong>Registry Rules:</strong> No impersonation, no broken links. One per target.
-        <br>
-        <a href="https://github.com/modding-community-com/register" target="_blank">View Repository &rarr;</a>
-    </section>
-
-    <h2>Create your entry</h2>
-    <div class="creator-box">
-        <div class="form-group">
-            <label>Subdomain Name</label>
-            <input type="text" id="subdomain" placeholder="awesome-mod" oninput="updateJson()">
-        </div>
-        <div class="form-group">
-            <label>Record Type</label>
-            <select id="type" onchange="updateJson()">
-                <option value="CNAME">CNAME (GitHub Pages, Vercel, Netlify)</option>
-                <option value="A">A (Direct IP Address)</option>
-                <option value="REDIRECT">REDIRECT (Have another way to get to your site!)</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label>Target Value</label>
-            <input type="text" id="target" placeholder="username.github.io" oninput="updateJson()">
-        </div>
-
-        <div class="output-area">
-            <label style="color:#666; font-family: sans-serif; display:block; margin-bottom:10px;">Preview: <span id="filename-preview" style="color:var(--accent)">subdomain.json</span></label>
-            <pre id="json-display">{}</pre>
-        </div>
-        
-        <button onclick="downloadJson()">Download Config</button>
+    <div class="nav-container">
+        <button class="nav-btn active" onclick="switchTab('browse')">Browse Communities</button>
+        <button class="nav-btn" onclick="switchTab('create')">Add Community</button>
     </div>
 
-    <h2>How to publish</h2>
-    <ol style="color:#b0b0cf; margin-top: 20px;">
-        <li>Fork the <a href="https://github.com/modding-community-com/register" target="_blank">registry repo</a>.</li>
-        <li>Place your downloaded <code>.json</code> file in the <code>domains/</code> folder.</li>
-        <li>Submit a Pull Request.</li>
-        <li>Configure your host (GitHub/Vercel) to accept the new domain.</li>
-        <li>If you choose the REDIRECT type, you do not need to do any setup on your website, only submit the PR here.</li>
-    </ol>
+    <section id="section-browse" class="page-section active">
+        <div class="controls-row">
+            <input type="text" id="searchBar" class="search-bar" placeholder="Search by name or subdomain..." oninput="filterCommunities()">
+            <button class="refresh-btn" onclick="fetchRegistry(true)" title="Force Refresh Data">↻</button>
+        </div>
+        <div id="loading" style="text-align: center; color: var(--accent); padding: 20px;">Fetching registry...</div>
+        <div class="community-grid" id="community-grid"></div>
+    </section>
+
+    <section id="section-create" class="page-section">
+        <div class="creator-box">
+            <div class="form-group">
+                <label>Community Display Name</label>
+                <input type="text" id="disp-name" placeholder="YAPYAP" oninput="updateJson()">
+            </div>
+            <div class="form-group">
+                <label>Subdomain Name</label>
+                <input type="text" id="sub-name" placeholder="yapyap" oninput="updateJson()">
+            </div>
+            <div class="form-group">
+                <label>Record Type</label>
+                <select id="rec-type" onchange="updateJson()">
+                    <option value="CNAME">CNAME (GitHub Pages, Vercel, Netlify)</option>
+                    <option value="A">A (Direct IP Address)</option>
+                    <option value="REDIRECT">REDIRECT (URL Forwarding)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Target Value</label>
+                <input type="text" id="target-val" placeholder="yapyapmodding.github.io" oninput="updateJson()">
+            </div>
+
+            <div class="output-area">
+                <label style="color:#666; font-size: 0.8rem; display:block; margin-bottom:10px;">File: <span id="filename-preview" style="color:var(--accent)">subdomain.json</span></label>
+                <pre id="json-display">{}</pre>
+            </div>
+            
+            <div class="button-group">
+                <button class="action-btn" onclick="downloadJson()">Download .json</button>
+                <button class="action-btn secondary" onclick="copyJson()">Copy Code</button>
+            </div>
+        </div>
+
+        <div class="step-box">
+            <h4>Instructions: What to do with this file</h4>
+            <ol>
+                <li>Fork the <a href="https://github.com/modding-community-com/register" target="_blank">Registry Repository</a>.</li>
+                <li>Navigate to the <code>domains/</code> folder in your fork.</li>
+                <li>Upload your <code>.json</code> file (or create a new file and paste the copied code).</li>
+                <li>Upload an icon that is 360x480px and the same name as the subdomain, this is not required but recommended for the browser!</li>
+                <li>Submit a <strong>Pull Request</strong> back to the main repository.</li>
+                <li>Wait for approval! Once merged, your subdomain will go live within minutes.</li>
+            </ol>
+        </div>
+    </section>
 
     <footer>
         Managed by the community. Contact <strong>@atomictyler</strong> on Discord for reports.
     </footer>
 
     <script>
+        const REPO_OWNER = 'modding-community-com';
+        const REPO_NAME = 'register';
+        const CACHE_KEY = 'modding_registry_cache';
+        const CACHE_TIME = 3 * 60 * 60 * 1000; 
+
+        let allCommunities = [];
+
+        function switchTab(tab) {
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.page-section').forEach(sec => sec.classList.remove('active'));
+            
+            if (tab === 'browse') {
+                document.querySelector('.nav-btn:nth-child(1)').classList.add('active');
+                document.getElementById('section-browse').classList.add('active');
+            } else {
+                document.querySelector('.nav-btn:nth-child(2)').classList.add('active');
+                document.getElementById('section-create').classList.add('active');
+            }
+        }
+
+        async function fetchRegistry(force = false) {
+            const now = Date.now();
+            const cached = localStorage.getItem(CACHE_KEY);
+            
+            if (!force && cached) {
+                const parsed = JSON.parse(cached);
+                if (now - parsed.timestamp < CACHE_TIME) {
+                    allCommunities = parsed.data;
+                    renderCommunities(allCommunities);
+                    return;
+                }
+            }
+
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('loading').textContent = "Syncing with GitHub...";
+
+            try {
+                const response = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/domains`);
+                const files = await response.json();
+                
+                const fetchPromises = files
+                    .filter(f => f.name.endsWith('.json'))
+                    .map(async f => {
+                        const res = await fetch(f.download_url);
+                        return await res.json();
+                    });
+
+                allCommunities = await Promise.all(fetchPromises);
+                
+                localStorage.setItem(CACHE_KEY, JSON.stringify({
+                    timestamp: now,
+                    data: allCommunities
+                }));
+
+                renderCommunities(allCommunities);
+            } catch (e) {
+                document.getElementById('loading').textContent = "Error loading registry. GitHub rate limit might be exceeded.";
+            }
+        }
+
+        function renderCommunities(list) {
+            const grid = document.getElementById('community-grid');
+            document.getElementById('loading').style.display = 'none';
+            grid.innerHTML = '';
+
+            list.forEach(item => {
+                // Use inner subdomain field for link and icon
+                const sub = item.subdomain;
+                const display = item.display || sub;
+
+                const card = document.createElement('a');
+                card.className = 'community-card';
+                card.href = `https://${sub}.modding-community.com`;
+                card.target = "_blank";
+
+                const iconWrapper = document.createElement('div');
+                iconWrapper.className = 'community-icon-wrapper';
+                
+                const img = document.createElement('img');
+                img.className = 'community-icon';
+                const iconBase = `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/main/icons/${sub}`;
+                const exts = ['.webp', '.png', '.jpg', '.jpeg'];
+                let eIdx = 0;
+
+                img.src = iconBase + exts[eIdx];
+                img.onerror = () => {
+                    eIdx++;
+                    if (eIdx < exts.length) img.src = iconBase + exts[eIdx];
+                    else {
+                        img.style.display = 'none';
+                        const fallback = document.createElement('div');
+                        fallback.className = 'icon-fallback';
+                        fallback.textContent = '?';
+                        iconWrapper.appendChild(fallback);
+                    }
+                };
+                iconWrapper.appendChild(img);
+
+                const info = document.createElement('div');
+                info.className = 'community-info';
+                info.innerHTML = `
+                    <span class="community-display-name">${display}</span>
+                    <span class="community-subdomain">${sub}.modding-community.com</span>
+                `;
+
+                card.appendChild(iconWrapper);
+                card.appendChild(info);
+                grid.appendChild(card);
+            });
+        }
+
+        function filterCommunities() {
+            const query = document.getElementById('searchBar').value.toLowerCase();
+            const filtered = allCommunities.filter(c => 
+                (c.display && c.display.toLowerCase().includes(query)) || 
+                c.subdomain.toLowerCase().includes(query)
+            );
+            renderCommunities(filtered);
+        }
+
         function updateJson() {
-            const sub = document.getElementById('subdomain').value || "your-subdomain";
-            const type = document.getElementById('type').value;
-            const target = document.getElementById('target').value || "target.example.com";
+            const disp = document.getElementById('disp-name').value || "My Community";
+            const sub = document.getElementById('sub-name').value || "subdomain";
+            const type = document.getElementById('rec-type').value;
+            const target = document.getElementById('target-val').value || "target.example.com";
 
             const config = {
                 "subdomain": sub,
                 "type": type,
-                "target": target
+                "target": target,
+                "display": disp
             };
 
             document.getElementById('json-display').textContent = JSON.stringify(config, null, 4);
@@ -244,21 +418,26 @@
         }
 
         function downloadJson() {
-            const sub = document.getElementById('subdomain').value || "subdomain";
+            const sub = document.getElementById('sub-name').value || "subdomain";
             const content = document.getElementById('json-display').textContent;
             const blob = new Blob([content], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
-            
             a.href = url;
             a.download = sub + ".json";
-            document.body.appendChild(a);
             a.click();
-            document.body.removeChild(a);
             URL.revokeObjectURL(url);
         }
 
+        function copyJson() {
+            const content = document.getElementById('json-display').textContent;
+            navigator.clipboard.writeText(content).then(() => {
+                alert("JSON copied to clipboard!");
+            });
+        }
+
         updateJson();
+        fetchRegistry();
     </script>
 </body>
 </html>

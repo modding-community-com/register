@@ -21,8 +21,9 @@ To maintain the integrity of the registry, the following rules are enforced:
 1. **Fork this repository** to your own GitHub account.
 2. **Create a new JSON file** in the `domains/` directory. The filename must be `your-subdomain.json`.
 3. **Define your configuration** using the JSON structure (subdomain, type, and target).
-4. **Submit a Pull Request** from your fork to our `main` branch.
-5. **Validation:** Automated scripts will check for duplicates and formatting errors. If the checks pass and the content is appropriate, a maintainer will merge the PR. Your domain will be live within minutes of the merge.
+4. **Upload an icon** that is 360x480px and the same name as the subdomain, this is not required but recommended for the browser! https://modding-community.com/
+5. **Submit a Pull Request** from your fork to our `main` branch.
+6. **Validation:** Automated scripts will check for duplicates and formatting errors. If the checks pass and the content is appropriate, a maintainer will merge the PR. Your domain will be live within minutes of the merge.
 
 If you choose the REDIRECT type, you do not need to do any setup on your website, only submit the PR here.
 

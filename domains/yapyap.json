@@ -1,5 +1,6 @@
 {
     "subdomain": "yapyap",
     "type": "CNAME",
-    "target": "yapyapmodding.github.io"
+    "target": "yapyapmodding.github.io",
+    "display": "YAPYAP"
 }

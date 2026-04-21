@@ -1,5 +1,6 @@
 {
     "subdomain": "repo",
     "type": "REDIRECT",
-    "target": "repomods.com"
+    "target": "repomods.com",
+    "display": "R.E.P.O."
 }
