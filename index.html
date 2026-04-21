@@ -227,7 +227,7 @@
     <section id="section-browse" class="page-section active">
         <div class="controls-row">
             <input type="text" id="searchBar" class="search-bar" placeholder="Search by name or subdomain..." oninput="filterCommunities()">
-            <button class="refresh-btn" onclick="fetchRegistry()" title="Refresh List">↻</button>
+            <button class="refresh-btn" onclick="fetchRegistry(true)" title="Force Refresh List">↻</button>
         </div>
         <div id="loading" style="text-align: center; color: var(--accent); padding: 20px;">Loading...</div>
         <div class="community-grid" id="community-grid"></div>
@@ -284,46 +284,72 @@
     </footer>
 
     <script>
-        let allCommunities = [];
+          let allCommunities = [];
 
-        function switchTab(tab) {
-            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-            document.querySelectorAll('.page-section').forEach(sec => sec.classList.remove('active'));
+          function switchTab(tab) {
+              document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+              document.querySelectorAll('.page-section').forEach(sec => sec.classList.remove('active'));
+              
+              if (tab === 'browse') {
+                  document.querySelector('.nav-btn:nth-child(1)').classList.add('active');
+                  document.getElementById('section-browse').classList.add('active');
+              } else {
+                  document.querySelector('.nav-btn:nth-child(2)').classList.add('active');
+                  document.getElementById('section-create').classList.add('active');
+              }
+          }
+
+        const CACHE_KEY = 'registry_data';
+        const CACHE_TIME_KEY = 'registry_timestamp';
+        const THREE_HOURS = 3 * 60 * 60 * 1000;
+
+        async function fetchRegistry(forceRefresh = false) {
+            const loadingEl = document.getElementById('loading');
+            loadingEl.style.display = 'block';
             
-            if (tab === 'browse') {
-                document.querySelector('.nav-btn:nth-child(1)').classList.add('active');
-                document.getElementById('section-browse').classList.add('active');
-            } else {
-                document.querySelector('.nav-btn:nth-child(2)').classList.add('active');
-                document.getElementById('section-create').classList.add('active');
-            }
-        }
+            const now = Date.now();
+            const cachedData = localStorage.getItem(CACHE_KEY);
+            const cachedTime = localStorage.getItem(CACHE_TIME_KEY);
 
-        async function fetchRegistry() {
-            document.getElementById('loading').style.display = 'block';
+            if (!forceRefresh && cachedData && cachedTime && (now - cachedTime < THREE_HOURS)) {
+                console.log("Loading from cache...");
+                allCommunities = JSON.parse(cachedData);
+                renderCommunities(allCommunities);
+                return;
+            }
+
+            console.log("Fetching new data from GitHub...");
             const grid = document.getElementById('community-grid');
             grid.innerHTML = '';
 
             try {
-                const response = await fetch('domains/');
-                const text = await response.text();
+                const listResponse = await fetch('https://api.github.com/repos/modding-community-com/register/contents/domains');
+                if (!listResponse.ok) throw new Error("GitHub API limit reached");
                 
-                const parser = new DOMParser();
-                const htmlDoc = parser.parseFromString(text, 'text/html');
-                const links = Array.from(htmlDoc.querySelectorAll('a'))
-                                   .map(a => a.getAttribute('href'))
-                                   .filter(href => href && href.endsWith('.json'));
+                const files = await listResponse.json();
 
-                const fetchPromises = links.map(async file => {
-                    const path = file;
-                    const res = await fetch(path);
-                    return await res.json();
-                });
+                const fetchPromises = files
+                    .filter(file => file.name.endsWith('.json'))
+                    .map(async file => {
+                        const res = await fetch(`domains/${file.name}`);
+                        return await res.json();
+                    });
 
                 allCommunities = await Promise.all(fetchPromises);
+                
+                localStorage.setItem(CACHE_KEY, JSON.stringify(allCommunities));
+                localStorage.setItem(CACHE_TIME_KEY, now.toString());
+
                 renderCommunities(allCommunities);
             } catch (e) {
-                document.getElementById('loading').textContent = "Error loading files.";
+                console.error(e);
+                if (cachedData) {
+                    loadingEl.textContent = "API error. Using older cached data.";
+                    allCommunities = JSON.parse(cachedData);
+                    setTimeout(() => renderCommunities(allCommunities), 1500);
+                } else {
+                    loadingEl.textContent = "Registry unavailable. Try again later.";
+                }
             }
         }
 
