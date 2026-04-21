@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>modding-community.com registry</title>
+    <link rel="icon" type="image/png" href="favicon/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="favicon/favicon.svg" />
+    <link rel="shortcut icon" href="favicon/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png" />
+    <link rel="manifest" href="favicon/site.webmanifest" />
     <style>
         :root {
             --bg: #0b0114; 
@@ -323,54 +328,61 @@
         }
 
         function renderCommunities(list) {
-            const grid = document.getElementById('community-grid');
-            document.getElementById('loading').style.display = 'none';
-            grid.innerHTML = '';
+          const grid = document.getElementById('community-grid');
+          document.getElementById('loading').style.display = 'none';
+          grid.innerHTML = '';
 
-            list.forEach(item => {
-                const sub = item.subdomain;
-                const display = item.display || sub;
+          list.forEach(async item => {
+              const sub = item.subdomain;
+              const display = item.display || sub;
 
-                const card = document.createElement('a');
-                card.className = 'community-card';
-                card.href = `https://${sub}.modding-community.com`;
-                card.target = "_blank";
+              const card = document.createElement('a');
+              card.className = 'community-card';
+              card.href = `https://${sub}.modding-community.com`;
+              card.target = "_blank";
 
-                const iconWrapper = document.createElement('div');
-                iconWrapper.className = 'community-icon-wrapper';
-                
-                const img = document.createElement('img');
-                img.className = 'community-icon';
-                const iconBase = `icons/${sub}`;
-                const exts = ['.webp', '.png', '.jpg', '.jpeg'];
-                let eIdx = 0;
+              const iconWrapper = document.createElement('div');
+              iconWrapper.className = 'community-icon-wrapper';
 
-                img.src = iconBase + exts[eIdx];
-                img.onerror = () => {
-                    eIdx++;
-                    if (eIdx < exts.length) img.src = iconBase + exts[eIdx];
-                    else {
-                        img.style.display = 'none';
-                        const fallback = document.createElement('div');
-                        fallback.className = 'icon-fallback';
-                        fallback.textContent = '?';
-                        iconWrapper.appendChild(fallback);
-                    }
-                };
-                iconWrapper.appendChild(img);
+              const img = document.createElement('img');
+              img.className = 'community-icon';
+              
+              const exts = ['.webp', '.png', '.jpg', '.jpeg'];
+              let foundSrc = null;
 
-                const info = document.createElement('div');
-                info.className = 'community-info';
-                info.innerHTML = `
-                    <span class="community-display-name">${display}</span>
-                    <span class="community-subdomain">${sub}.modding-community.com</span>
-                `;
+              for (const ext of exts) {
+                  try {
+                      const response = await fetch(`icons/${sub}${ext}`, { method: 'HEAD' });
+                      if (response.ok) {
+                          foundSrc = `icons/${sub}${ext}`;
+                          break;
+                      }
+                  } catch (e) {
+                  }
+              }
 
-                card.appendChild(iconWrapper);
-                card.appendChild(info);
-                grid.appendChild(card);
-            });
-        }
+              if (foundSrc) {
+                  img.src = foundSrc;
+                  iconWrapper.appendChild(img);
+              } else {
+                  const fallback = document.createElement('div');
+                  fallback.className = 'icon-fallback';
+                  fallback.textContent = '?';
+                  iconWrapper.appendChild(fallback);
+              }
+
+              const info = document.createElement('div');
+              info.className = 'community-info';
+              info.innerHTML = `
+                  <span class="community-display-name">${display}</span>
+                  <span class="community-subdomain">${sub}.modding-community.com</span>
+              `;
+
+              card.appendChild(iconWrapper);
+              card.appendChild(info);
+              grid.appendChild(card);
+          });
+      }
 
         function filterCommunities() {
             const query = document.getElementById('searchBar').value.toLowerCase();

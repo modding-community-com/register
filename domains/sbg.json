@@ -1,0 +1,6 @@
+{
+    "subdomain": "sbg",
+    "type": "CNAME",
+    "target": "https://superbattlegolfmodding.github.io/",
+    "display": "Super Battle Golf"
+}
