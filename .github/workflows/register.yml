@@ -20,56 +20,57 @@ jobs:
         run: |
           FILES=$(git diff --name-status HEAD^ HEAD | grep 'domains/.*.json' || true)
 
-          if [ -z "$FILES" ]; then
-            echo "No domain changes detected."
-            exit 0
-          fi
-
           echo "$FILES" | while read -r line; do
+              [ -z "$line" ] && continue
               STATUS=$(echo $line | awk '{print $1}')
               FILE_PATH=$(echo $line | awk '{print $2}')
               SUBDOMAIN_NAME=$(basename "$FILE_PATH" .json)
               FULL_DOMAIN="$SUBDOMAIN_NAME.modding-community.com"
 
-              echo "--- Processing: $FULL_DOMAIN (Action: $STATUS) ---"
+              echo "--- Processing: $FULL_DOMAIN ---"
 
-              DNS_RECORD_ID=$(curl -s -X GET "https://api.cloudflare.com/client/v4/zones/$CF_ZONE_ID/dns_records?name=$FULL_DOMAIN" \
-                  -H "Authorization: Bearer $CF_API_TOKEN" | jq -r '.result[0].id // empty')
+              DNS_IDS=$(curl -s -H "Authorization: Bearer $CF_API_TOKEN" \
+                "https://api.cloudflare.com/client/v4/zones/$CF_ZONE_ID/dns_records?name=$FULL_DOMAIN" | jq -r '.result[].id')
+              
+              for ID in $DNS_IDS; do
+                echo "Deleting old DNS record $ID..."
+                curl -s -X DELETE "https://api.cloudflare.com/client/v4/zones/$CF_ZONE_ID/dns_records/$ID" -H "Authorization: Bearer $CF_API_TOKEN"
+              done
 
-              PAGE_RULE_ID=$(curl -s -X GET "https://api.cloudflare.com/client/v4/zones/$CF_ZONE_ID/pagerules?status=active" \
-                  -H "Authorization: Bearer $CF_API_TOKEN" | jq -r ".result[] | select(.targets[].constraint.value == \"$FULL_DOMAIN/*\") | .id" | head -n 1)
+              PAGE_RULE_IDS=$(curl -s -H "Authorization: Bearer $CF_API_TOKEN" \
+                "https://api.cloudflare.com/client/v4/zones/$CF_ZONE_ID/pagerules" | jq -r ".result[]? | select(.targets[].constraint.value == \"$FULL_DOMAIN/*\") | .id")
 
-              if [ ! -z "$DNS_RECORD_ID" ]; then
-                  echo "Removing existing DNS record..."
-                  curl -s -X DELETE "https://api.cloudflare.com/client/v4/zones/$CF_ZONE_ID/dns_records/$DNS_RECORD_ID" -H "Authorization: Bearer $CF_API_TOKEN"
-              fi
-              if [ ! -z "$PAGE_RULE_ID" ]; then
-                  echo "Removing existing Page Rule..."
-                  curl -s -X DELETE "https://api.cloudflare.com/client/v4/zones/$CF_ZONE_ID/pagerules/$PAGE_RULE_ID" -H "Authorization: Bearer $CF_API_TOKEN"
-              fi
+              for RID in $PAGE_RULE_IDS; do
+                echo "Deleting old Page Rule $RID..."
+                curl -s -X DELETE "https://api.cloudflare.com/client/v4/zones/$CF_ZONE_ID/pagerules/$RID" -H "Authorization: Bearer $CF_API_TOKEN"
+              done
 
               if [[ "$STATUS" == "A" || "$STATUS" == "M" ]]; then
                   TYPE=$(jq -r '.type' "$FILE_PATH")
                   TARGET=$(jq -r '.target' "$FILE_PATH")
 
                   if [ "$TYPE" == "REDIRECT" ]; then
-                      echo "Creating Redirect Page Rule for $FULL_DOMAIN -> $TARGET"
-                      curl -s -X POST "https://api.cloudflare.com/client/v4/zones/$CF_ZONE_ID/dns_records" \
-                          -H "Authorization: Bearer $CF_API_TOKEN" \
-                          -H "Content-Type: application/json" \
-                          --data "{\"type\":\"AAAA\",\"name\":\"$SUBDOMAIN_NAME\",\"content\":\"100::\",\"ttl\":3600,\"proxied\":true}"
+                      echo "Setting up REDIRECT..."
+                      # Ensure TARGET has http/https for the redirect to work
+                      [[ $TARGET != http* ]] && TARGET="https://$TARGET"
 
-                      curl -s -X POST "https://api.cloudflare.com/client/v4/zones/$CF_ZONE_ID/pagerules" \
-                          -H "Authorization: Bearer $CF_API_TOKEN" \
-                          -H "Content-Type: application/json" \
-                          --data "{\"targets\":[{\"target\":\"url\",\"constraint\":{\"operator\":\"matches\",\"value\":\"$FULL_DOMAIN/*\"}}],\"actions\":[{\"id\":\"forwarding_url\",\"value\":{\"url\":\"$TARGET\",\"status_code\":301}}],\"status\":\"active\"}"
-                  else
-                      echo "Creating $TYPE record for $FULL_DOMAIN -> $TARGET"
                       curl -s -X POST "https://api.cloudflare.com/client/v4/zones/$CF_ZONE_ID/dns_records" \
                           -H "Authorization: Bearer $CF_API_TOKEN" \
                           -H "Content-Type: application/json" \
-                          --data "{\"type\":\"$TYPE\",\"name\":\"$SUBDOMAIN_NAME\",\"content\":\"$TARGET\",\"ttl\":3600,\"proxied\":true}"
+                          --data "{\"type\":\"AAAA\",\"name\":\"$SUBDOMAIN_NAME\",\"content\":\"100::\",\"proxied\":true}"
+
+                      RESPONSE=$(curl -s -X POST "https://api.cloudflare.com/client/v4/zones/$CF_ZONE_ID/pagerules" \
+                          -H "Authorization: Bearer $CF_API_TOKEN" \
+                          -H "Content-Type: application/json" \
+                          --data "{\"targets\":[{\"target\":\"url\",\"constraint\":{\"operator\":\"matches\",\"value\":\"$FULL_DOMAIN/*\"}}],\"actions\":[{\"id\":\"forwarding_url\",\"value\":{\"url\":\"$TARGET/\$1\",\"status_code\":301}}],\"status\":\"active\"}")
+                      
+                      echo "CF Response: $RESPONSE"
+                  else
+                      echo "Setting up $TYPE record..."
+                      curl -s -X POST "https://api.cloudflare.com/client/v4/zones/$CF_ZONE_ID/dns_records" \
+                          -H "Authorization: Bearer $CF_API_TOKEN" \
+                          -H "Content-Type: application/json" \
+                          --data "{\"type\":\"$TYPE\",\"name\":\"$SUBDOMAIN_NAME\",\"content\":\"$TARGET\",\"proxied\":true}"
                   fi
               fi
-              sleep 1
           done
