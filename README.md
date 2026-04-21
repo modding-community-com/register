@@ -24,6 +24,8 @@ To maintain the integrity of the registry, the following rules are enforced:
 4. **Submit a Pull Request** from your fork to our `main` branch.
 5. **Validation:** Automated scripts will check for duplicates and formatting errors. If the checks pass and the content is appropriate, a maintainer will merge the PR. Your domain will be live within minutes of the merge.
 
+If you choose the REDIRECT type, you do not need to do any setup on your website, only submit the PR here.
+
 ```json
 {
     "subdomain": "your-subdomain",
@@ -34,6 +36,7 @@ To maintain the integrity of the registry, the following rules are enforced:
 
 > [!NOTE]
 > This is not limited to GitHub pages!
+> You can also change type to "REDIRECT" if you already have a custom domain.
 
 ---
 
