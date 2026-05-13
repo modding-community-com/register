@@ -3,310 +3,627 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registry | modding-community.com</title>
+    <title>modding-community.com</title>
     <link rel="icon" type="image/png" href="favicon/favicon-96x96.png" sizes="96x96" />
     <link rel="icon" type="image/svg+xml" href="favicon/favicon.svg" />
     <link rel="shortcut icon" href="favicon/favicon.ico" />
     <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png" />
     <link rel="manifest" href="favicon/site.webmanifest" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg: #0d021a;
             --surface: #160826;
-            --surface-hover: #1e0b33;
-            --text: #e2e2f0;
-            --text-dim: #948ba1;
+            --surface-hover: #1d0b35;
+            --text: #ddd6f0;
+            --text-dim: #7a6f8a;
             --accent: #9d4edd;
-            --accent-glow: rgba(157, 78, 221, 0.3);
-            --border: #2d1a45;
+            --accent-glow: rgba(157, 78, 221, 0.25);
+            --accent-light: #b57bee;
+            --border: #251540;
+            --border-light: #3a2260;
             --input-bg: #080112;
-            --cog-color: rgba(157, 78, 221, 0.04);
-            --vignette: rgb(5, 0, 10); 
+            --green: #4edd9d;
+            --green-glow: rgba(78, 221, 157, 0.2);
         }
 
-        @keyframes rotate {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            font-family: 'Inter', -apple-system, system-ui, sans-serif;
-            line-height: 1.6;
+            font-family: 'Outfit', sans-serif;
             color: var(--text);
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 60px 20px;
             background: var(--bg);
-            position: relative;
+            min-height: 100vh;
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
         }
 
-        .vignette {
+        .bg-layer {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle, transparent 40%, var(--vignette) 150%);
+            inset: 0;
+            z-index: 0;
             pointer-events: none;
-            z-index: 100;
+        }
+        .bg-layer::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 60% 40% at 10% 10%, rgba(157,78,221,0.08) 0%, transparent 70%),
+                radial-gradient(ellipse 50% 60% at 90% 80%, rgba(78,221,157,0.04) 0%, transparent 60%);
+        }
+        .bg-grid {
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(157,78,221,0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(157,78,221,0.04) 1px, transparent 1px);
+            background-size: 40px 40px;
+            mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 20%, transparent 100%);
         }
 
-        .cog-container {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -1; pointer-events: none;
+        .wrapper {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 56px 24px 80px;
+            position: relative;
+            z-index: 1;
         }
-
-        .cog { position: absolute; fill: var(--cog-color); transition: fill 0.3s ease; }
-        .cog-1 { width: 600px; height: 600px; top: -150px; left: -200px; animation: rotate 120s linear infinite; }
-        .cog-2 { width: 400px; height: 400px; bottom: -100px; right: -150px; animation: rotate 80s linear infinite reverse; }
 
         header {
-            margin-bottom: 50px;
             text-align: center;
+            margin-bottom: 48px;
         }
 
-        h1 { 
-            margin: 0; 
-            font-size: 2.5rem; 
+        .site-title {
+            font-size: clamp(2rem, 5vw, 3rem);
             font-weight: 800;
-            letter-spacing: -0.02em;
-            background: linear-gradient(135deg, #fff 0%, var(--accent) 100%);
+            letter-spacing: -0.03em;
+            background: linear-gradient(135deg, #fff 0%, var(--accent-light) 60%, var(--accent) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.1;
         }
 
-        .nav-container {
+        .site-subtitle {
+            margin-top: 10px;
+            color: var(--text-dim);
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .nav-wrap {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 48px;
+        }
+
+        .nav {
             display: inline-flex;
             background: var(--surface);
-            padding: 6px;
-            border-radius: 16px;
             border: 1px solid var(--border);
-            margin-bottom: 50px;
-            position: relative;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 101;
+            border-radius: 14px;
+            padding: 5px;
+            gap: 4px;
         }
 
         .nav-btn {
             background: transparent;
             border: none;
             color: var(--text-dim);
-            padding: 10px 24px;
-            border-radius: 12px;
+            padding: 9px 22px;
+            border-radius: 10px;
             cursor: pointer;
+            font-family: 'Outfit', sans-serif;
             font-weight: 600;
-            font-size: 0.95rem;
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 0.9rem;
+            transition: color 0.2s, background 0.2s, box-shadow 0.2s;
         }
-
-        .nav-btn:hover { color: #fff; }
-
+        .nav-btn:hover { color: var(--text); }
         .nav-btn.active {
             background: var(--accent);
-            color: white;
-            box-shadow: 0 4px 15px var(--accent-glow);
+            color: #fff;
+            box-shadow: 0 2px 12px var(--accent-glow);
         }
 
-        .controls-row {
+        .section { display: none; }
+        .section.active {
+            display: block;
+            animation: fadeUp 0.3s ease both;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(8px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .controls {
             display: flex;
-            gap: 12px;
-            margin-bottom: 40px;
-            position: relative;
-            z-index: 101;
+            gap: 10px;
+            margin-bottom: 32px;
         }
 
-        .search-bar {
-            flex-grow: 1;
-            padding: 16px 20px;
-            font-size: 1rem;
-            border-radius: 14px;
+        .search {
+            flex: 1;
+            padding: 13px 18px;
+            font-size: 0.95rem;
+            font-family: 'Outfit', sans-serif;
+            border-radius: 12px;
             border: 1px solid var(--border);
             background: var(--surface);
-            color: white;
-            transition: all 0.2s ease;
-            outline: none;
-        }
-
-        .search-bar:focus {
-            border-color: var(--accent);
-            box-shadow: 0 0 0 4px var(--accent-glow);
-        }
-
-        .refresh-btn {
-            background: var(--surface);
-            border: 1px solid var(--border);
             color: var(--text);
-            padding: 0 20px;
-            border-radius: 14px;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 1.2rem;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .search::placeholder { color: var(--text-dim); }
+        .search:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow);
         }
 
-        .refresh-btn:hover { 
-            background: var(--surface-hover);
-            border-color: var(--text-dim);
-        }
-
-        .community-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-            gap: 24px;
-            position: relative;
-            z-index: 101;
-        }
-
-        .community-card {
+        .icon-btn {
             background: var(--surface);
             border: 1px solid var(--border);
-            border-radius: 20px;
+            color: var(--text-dim);
+            width: 48px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: border-color 0.2s, color 0.2s;
+        }
+        .icon-btn:hover { border-color: var(--border-light); color: var(--text); }
+
+        /* ── Grid ── */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 18px;
             overflow: hidden;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             text-decoration: none;
             display: flex;
             flex-direction: column;
+            transition: transform 0.3s ease, border-color 0.3s, box-shadow 0.3s;
+        }
+        .card:hover {
+            transform: translateY(-6px);
+            border-color: var(--border-light);
+            box-shadow: 0 16px 40px rgba(0,0,0,0.5);
         }
 
-        .community-card:hover {
-            transform: translateY(-8px);
-            border-color: var(--accent);
-            background: var(--surface-hover);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-        }
-
-        .community-icon-wrapper {
+        .card-img {
             width: 100%;
-            aspect-ratio: 3 / 4;
-            background: #05000a;
+            aspect-ratio: 3/4;
+            background: #06000f;
             display: flex;
             align-items: center;
             justify-content: center;
             overflow: hidden;
             border-bottom: 1px solid var(--border);
         }
+        .card-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+        .card:hover .card-img img { transform: scale(1.04); }
 
-        .community-icon { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
-        .community-card:hover .community-icon { transform: scale(1.05); }
-
-        .icon-fallback { font-size: 40px; color: var(--border); font-weight: 800; }
-
-        .community-info { padding: 20px; text-align: left; }
-        .community-display-name { color: #fff; font-weight: 700; font-size: 1.1rem; display: block; margin-bottom: 4px; }
-        .community-subdomain { color: var(--accent); font-size: 0.85rem; font-family: 'JetBrains Mono', monospace; font-weight: 500; }
-
-        .page-section { display: none; animation: fadeIn 0.4s ease; }
-        .page-section.active { display: block; }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        .card-fallback {
+            font-size: 36px;
+            font-weight: 800;
+            color: var(--border-light);
         }
 
-        .creator-box {
+        .card-info { padding: 16px; }
+        .card-name {
+            color: #fff;
+            font-weight: 700;
+            font-size: 1rem;
+            display: block;
+            margin-bottom: 3px;
+        }
+        .card-sub {
+            color: var(--accent);
+            font-size: 0.78rem;
+            font-family: 'Space Mono', monospace;
+            font-weight: 400;
+            opacity: 0.85;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-dim);
+            grid-column: 1/-1;
+        }
+        .empty-state p { margin-top: 8px; font-size: 0.9rem; }
+
+        #loading {
+            text-align: center;
+            padding: 60px;
+            color: var(--text-dim);
+            font-size: 0.9rem;
+        }
+        .loading-dot {
+            display: inline-block;
+            animation: pulse 1.2s ease-in-out infinite;
+        }
+        .loading-dot:nth-child(2) { animation-delay: 0.2s; }
+        .loading-dot:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes pulse {
+            0%, 80%, 100% { opacity: 0.3; }
+            40% { opacity: 1; }
+        }
+
+        /* ── Register Form ── */
+        .form-box {
             border: 1px solid var(--border);
-            padding: 40px;
-            border-radius: 24px;
+            padding: 36px;
+            border-radius: 20px;
             background: var(--surface);
-            max-width: 700px;
+            max-width: 640px;
             margin: 0 auto;
-            position: relative;
-            z-index: 101;
         }
 
-        .form-group { margin-bottom: 24px; }
-        label { display: block; font-weight: 600; margin-bottom: 10px; font-size: 0.9rem; color: var(--text-dim); }
-        
+        .form-group { margin-bottom: 20px; }
+
+        label {
+            display: block;
+            font-weight: 600;
+            font-size: 0.82rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+        }
+
         input, select {
-            width: 100%; padding: 14px; border: 1px solid var(--border);
-            border-radius: 12px; box-sizing: border-box; 
-            background-color: var(--input-bg); color: var(--text);
-            font-size: 1rem; transition: border 0.2s;
-            outline: none;
-        }
-
-        input:focus, select:focus { border-color: var(--accent); }
-
-        .output-area {
-            margin-top: 30px; background: #05000a; padding: 24px;
-            border-radius: 16px; border: 1px solid var(--border);
-            position: relative;
-        }
-
-        pre { margin: 0; font-size: 0.9rem; color: #b892ff; font-family: 'JetBrains Mono', monospace; overflow-x: auto; }
-
-        .button-group { display: flex; gap: 12px; margin-top: 20px; }
-
-        .action-btn {
-            background: var(--accent); color: white; border: none; padding: 16px;
-            border-radius: 12px; cursor: pointer; font-weight: 700; flex: 1;
-            transition: all 0.2s;
-        }
-        
-        .action-btn.secondary { background: var(--border); color: var(--text); }
-        .action-btn:hover { transform: translateY(-2px); filter: brightness(1.1); }
-        .action-btn:active { transform: translateY(0); }
-
-        .step-box {
-            background: rgba(157, 78, 221, 0.05);
-            padding: 30px;
-            border-radius: 24px;
-            margin-top: 40px;
+            width: 100%;
+            padding: 13px 16px;
             border: 1px solid var(--border);
-            max-width: 700px;
-            margin-left: auto;
-            margin-right: auto;
-            position: relative;
-            z-index: 101;
+            border-radius: 10px;
+            background: var(--input-bg);
+            color: var(--text);
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        input:focus, select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+        select option { background: var(--surface); }
+
+        .output-box {
+            margin-top: 28px;
+            background: #06000f;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            overflow: hidden;
+        }
+        .output-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 16px;
+            border-bottom: 1px solid var(--border);
+        }
+        .output-filename {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.78rem;
+            color: var(--text-dim);
+        }
+        .output-filename span { color: var(--accent); }
+        pre {
+            margin: 0;
+            padding: 20px;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.85rem;
+            color: #b892ff;
+            overflow-x: auto;
         }
 
-        .step-box h4 { margin: 0 0 15px 0; color: #fff; font-size: 1.2rem; }
-        .step-box ol { padding-left: 20px; color: var(--text-dim); }
-        .step-box li { margin-bottom: 12px; }
+        .btn-row { display: flex; gap: 10px; margin-top: 20px; }
+
+        .btn {
+            flex: 1;
+            padding: 13px;
+            border-radius: 10px;
+            border: none;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: transform 0.15s, filter 0.15s;
+        }
+        .btn:hover { transform: translateY(-1px); filter: brightness(1.1); }
+        .btn:active { transform: none; }
+        .btn-primary { background: var(--accent); color: #fff; }
+        .btn-secondary { background: var(--border); color: var(--text); }
+
+        /* ── Steps ── */
+        .steps-box {
+            max-width: 640px;
+            margin: 24px auto 0;
+            background: rgba(157,78,221,0.04);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 28px 32px;
+        }
+        .steps-box h4 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 16px;
+        }
+        .steps-box ol {
+            padding-left: 18px;
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            line-height: 1.8;
+        }
+        .steps-box a { color: var(--accent); text-decoration: none; }
+        .steps-box a:hover { text-decoration: underline; }
+        .steps-box code {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.82rem;
+            background: rgba(157,78,221,0.1);
+            padding: 1px 6px;
+            border-radius: 4px;
+            color: var(--accent-light);
+        }
+
+        /* ── Discord Feature Section ── */
+        .feature-section {
+            margin: 0 auto 48px;
+            max-width: 760px;
+        }
+
+        .feature-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 32px;
+            position: relative;
+            overflow: hidden;
+        }
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+        }
+
+        .feature-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(78,221,157,0.1);
+            border: 1px solid rgba(78,221,157,0.25);
+            color: var(--green);
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            padding: 4px 10px;
+            border-radius: 6px;
+            margin-bottom: 14px;
+        }
+
+        .feature-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 8px;
+        }
+
+        .feature-desc {
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            line-height: 1.7;
+            margin-bottom: 20px;
+        }
+
+        .feature-try {
+            display: flex;
+            gap: 10px;
+            align-items: stretch;
+            flex-wrap: wrap;
+        }
+
+        .feature-input {
+            flex: 1;
+            min-width: 180px;
+            padding: 11px 14px;
+            font-size: 0.9rem;
+            font-family: 'Space Mono', monospace;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: var(--input-bg);
+            color: var(--text);
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .feature-input:focus { border-color: var(--accent); }
+
+        .feature-btn {
+            padding: 11px 22px;
+            background: var(--accent);
+            border: none;
+            border-radius: 10px;
+            color: #fff;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: filter 0.15s, transform 0.15s;
+            white-space: nowrap;
+        }
+        .feature-btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
+
+        .feature-result {
+            margin-top: 14px;
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 0.88rem;
+            font-family: 'Space Mono', monospace;
+            display: none;
+        }
+        .feature-result.loading {
+            display: block;
+            background: rgba(157,78,221,0.08);
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+        }
+        .feature-result.success {
+            display: block;
+            background: rgba(78,221,157,0.07);
+            border: 1px solid rgba(78,221,157,0.2);
+            color: var(--green);
+        }
+        .feature-result.error {
+            display: block;
+            background: rgba(221,78,78,0.07);
+            border: 1px solid rgba(221,78,78,0.2);
+            color: #f08080;
+        }
+
+        #redirect-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: var(--bg);
+            z-index: 999;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 16px;
+            text-align: center;
+        }
+        #redirect-overlay.active {
+            display: flex;
+            animation: fadeUp 0.3s ease;
+        }
+        .redirect-icon { font-size: 3rem; margin-bottom: 8px; }
+        .redirect-title { font-size: 1.4rem; font-weight: 700; color: #fff; }
+        .redirect-sub { color: var(--text-dim); font-size: 0.9rem; }
+        .redirect-status {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--accent);
+            min-height: 1.4em;
+        }
+        .redirect-cancel {
+            margin-top: 8px;
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+            padding: 8px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.85rem;
+            transition: border-color 0.2s, color 0.2s;
+        }
+        .redirect-cancel:hover { border-color: var(--border-light); color: var(--text); }
 
         footer {
-            margin-top: 100px; font-size: 0.9rem; color: var(--text-dim);
-            border-top: 1px solid var(--border); padding-top: 40px; text-align: center;
-            position: relative;
-            z-index: 101;
+            margin-top: 80px;
+            border-top: 1px solid var(--border);
+            padding-top: 32px;
+            text-align: center;
+            color: var(--text-dim);
+            font-size: 0.85rem;
         }
-
         footer a { color: var(--accent); text-decoration: none; font-weight: 600; }
         footer a:hover { text-decoration: underline; }
+        footer strong { color: var(--text); }
     </style>
 </head>
 <body>
 
-    <div class="vignette"></div>
+<div class="bg-layer"><div class="bg-grid"></div></div>
 
-    <div class="cog-container">
-        <svg class="cog cog-1" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path d="M6.50001 0H9.50001L10.0939 2.37548C10.7276 2.6115 11.3107 2.95155 11.8223 3.37488L14.1782 2.70096L15.6782 5.29904L13.9173 7.00166C13.9717 7.32634 14 7.65987 14 8C14 8.34013 13.9717 8.67366 13.9173 8.99834L15.6782 10.701L14.1782 13.299L11.8223 12.6251C11.3107 13.0484 10.7276 13.3885 10.0939 13.6245L9.50001 16H6.50001L5.90614 13.6245C5.27242 13.3885 4.68934 13.0484 4.17768 12.6251L1.82181 13.299L0.321808 10.701L2.08269 8.99834C2.02831 8.67366 2.00001 8.34013 2.00001 8C2.00001 7.65987 2.02831 7.32634 2.08269 7.00166L0.321808 5.29904L1.82181 2.70096L4.17768 3.37488C4.68934 2.95155 5.27241 2.6115 5.90614 2.37548L6.50001 0ZM8.00001 10C9.10458 10 10 9.10457 10 8C10 6.89543 9.10458 6 8.00001 6C6.89544 6 6.00001 6.89543 6.00001 8C6.00001 9.10457 6.89544 10 8.00001 10Z" /></svg>
-        <svg class="cog cog-2" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path d="M6.50001 0H9.50001L10.0939 2.37548C10.7276 2.6115 11.3107 2.95155 11.8223 3.37488L14.1782 2.70096L15.6782 5.29904L13.9173 7.00166C13.9717 7.32634 14 7.65987 14 8C14 8.34013 13.9717 8.67366 13.9173 8.99834L15.6782 10.701L14.1782 13.299L11.8223 12.6251C11.3107 13.0484 10.7276 13.3885 10.0939 13.6245L9.50001 16H6.50001L5.90614 13.6245C5.27242 13.3885 4.68934 13.0484 4.17768 12.6251L1.82181 13.299L0.321808 10.701L2.08269 8.99834C2.02831 8.67366 2.00001 8.34013 2.00001 8C2.00001 7.65987 2.02831 7.32634 2.08269 7.00166L0.321808 5.29904L1.82181 2.70096L4.17768 3.37488C4.68934 2.95155 5.27241 2.6115 5.90614 2.37548L6.50001 0ZM8.00001 10C9.10458 10 10 9.10457 10 8C10 6.89543 9.10458 6 8.00001 6C6.89544 6 6.00001 6.89543 6.00001 8C6.00001 9.10457 6.89544 10 8.00001 10Z" /></svg>
-    </div>
+<div id="redirect-overlay">
+    <div class="redirect-icon">Thunderstore discord finder</div>
+    <div class="redirect-title">Community Discord</div>
+    <div class="redirect-sub">Looking up community info...</div>
+    <div class="redirect-status" id="redirect-status">Loading...</div>
+    <button class="redirect-cancel" onclick="document.getElementById('redirect-overlay').classList.remove('active')">Cancel</button>
+</div>
 
+<div class="wrapper">
     <header>
-        <h1>*.modding-community.com</h1>
+        <h1 class="site-title">*.modding-community.com</h1>
+        <p class="site-subtitle">A way for small communities (or large ones) to have their own subdomain, redirects or for people to link discords easier.</p>
     </header>
 
-    <nav class="nav-container">
-        <button class="nav-btn active" onclick="switchTab('browse')">Browse</button>
-        <button class="nav-btn" onclick="switchTab('create')">Register</button>
-    </nav>
+    <div class="nav-wrap">
+        <nav class="nav">
+            <button class="nav-btn active" onclick="switchTab('browse')">Browse</button>
+            <button class="nav-btn" onclick="switchTab('discord')">Discord Redirect</button>
+            <button class="nav-btn" onclick="switchTab('register')">Register</button>
+        </nav>
+    </div>
 
-    <section id="section-browse" class="page-section active">
-        <div class="controls-row">
-            <input type="text" id="searchBar" class="search-bar" placeholder="Search communities..." oninput="filterCommunities()">
-            <button class="refresh-btn" onclick="fetchRegistry(true)" title="Refresh List">Refresh</button>
+    <section id="section-browse" class="section active">
+        <div class="controls">
+            <input class="search" type="text" id="searchBar" placeholder="Search communities..." oninput="filterCommunities()">
+            <button class="icon-btn" onclick="fetchRegistry()" title="Refresh">↻</button>
         </div>
-        <div id="loading" style="text-align: center; color: var(--accent); padding: 40px; font-weight: 600;">Loading registry...</div>
-        <div class="community-grid" id="community-grid"></div>
+        <div id="loading">
+            <span class="loading-dot">●</span>
+            <span class="loading-dot">●</span>
+            <span class="loading-dot">●</span>
+            <p style="margin-top: 12px;">Loading registry...</p>
+        </div>
+        <div class="grid" id="community-grid"></div>
     </section>
 
-    <section id="section-create" class="page-section">
-        <div class="creator-box">
+    <section id="section-discord" class="section">
+        <div class="feature-section" style="margin-bottom: 0;">
+            <div class="feature-card">
+                <div class="feature-badge">Feature</div>
+                <div class="feature-title">Discord Community Redirect</div>
+                <div class="feature-desc">
+                    Enter a Thunderstore community ID to be redirected to their Discord server. 
+                    This works via URL too, try linking to 
+                    <code style="font-size:0.8rem; background:rgba(157,78,221,0.1); padding:2px 6px; border-radius:4px; color:var(--accent-light); font-family:'Space Mono',monospace;">modding-community.com/#community-id</code> 
+                    to redirect visitors straight to a community's Discord. Credits for this feature go to <a href="https://scyye.dev/" target="_blank">https://scyye.dev/</a>
+                </div>
+                <div class="feature-try">
+                    <input class="feature-input" type="text" id="discord-input" placeholder="e.g. peak" oninput="onDiscordInput()">
+                    <button class="feature-btn" onclick="tryDiscordRedirect()">Look Up</button>
+                </div>
+                <div id="feature-result" class="feature-result"></div>
+            </div>
+
+            <div class="steps-box" style="margin-top: 20px;">
+                <h4>How it works</h4>
+                <ol>
+                    <li>Uses the <a href="https://github.com/thunderstore-io/ecosystem-schema" target="_blank">Thunderstore ecosystem schema</a> to find community Discord links.</li>
+                    <li>Linking to <code>modding-community.com/#peak</code> auto-redirects to that community's Discord.</li>
+                    <li>Works with any valid Thunderstore community ID.</li>
+                </ol>
+            </div>
+        </div>
+    </section>
+
+    <section id="section-register" class="section">
+        <div class="form-box">
             <div class="form-group">
                 <label>Display Name</label>
                 <input type="text" id="disp-name" placeholder="Epic Modding Hub" oninput="updateJson()">
@@ -328,169 +645,211 @@
                 <input type="text" id="target-val" placeholder="user.github.io" oninput="updateJson()">
             </div>
 
-            <div class="output-area">
-                <label style="color:var(--text-dim); font-size: 0.75rem; display:block; margin-bottom:12px; font-family: monospace;">FILE: <span id="filename-preview" style="color:var(--accent)">subdomain.json</span></label>
+            <div class="output-box">
+                <div class="output-header">
+                    <span class="output-filename">FILE: <span id="filename-preview">subdomain.json</span></span>
+                </div>
                 <pre id="json-display">{}</pre>
             </div>
-            
-            <div class="button-group">
-                <button class="action-btn" onclick="downloadJson()">Download JSON</button>
-                <button class="action-btn secondary" onclick="copyJson()">Copy Code</button>
+
+            <div class="btn-row">
+                <button class="btn btn-primary" onclick="downloadJson()">Download JSON</button>
+                <button class="btn btn-secondary" onclick="copyJson()">Copy</button>
             </div>
         </div>
 
-        <div class="step-box">
+        <div class="steps-box">
             <h4>Submission Steps</h4>
             <ol>
                 <li>Fork the <a href="https://github.com/modding-community-com/register" target="_blank">Registry Repo</a>.</li>
                 <li>Add your <code>.json</code> to the <code>domains/</code> folder.</li>
-                <li>Add your icon (360x480px) to <code>icons/</code> using the same filename.</li>
+                <li>Add your icon (360×480px) to <code>icons/</code> using the same filename.</li>
                 <li>Open a <strong>Pull Request</strong>.</li>
             </ol>
         </div>
     </section>
 
     <footer>
-        Managed by the community &bull; <strong>@atomictyler</strong>
+        Created for the community &bull; <strong>@atomictyler</strong>
         <br><br>
         <a href="https://atomictyler.dev/">Support the Project ♥</a>
     </footer>
+</div>
 
-    <script>
-        let allCommunities = [];
+<script>
+    let allCommunities = [];
 
-        function switchTab(tab) {
-            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-            document.querySelectorAll('.page-section').forEach(sec => sec.classList.remove('active'));
-            
-            if (tab === 'browse') {
-                document.querySelector('.nav-btn:nth-child(1)').classList.add('active');
-                document.getElementById('section-browse').classList.add('active');
-            } else {
-                document.querySelector('.nav-btn:nth-child(2)').classList.add('active');
-                document.getElementById('section-create').classList.add('active');
-            }
+    function switchTab(tab) {
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+        const map = { browse: 0, discord: 1, register: 2 };
+        document.querySelectorAll('.nav-btn')[map[tab]].classList.add('active');
+        document.getElementById('section-' + (tab === 'register' ? 'register' : tab)).classList.add('active');
+    }
+
+    async function fetchRegistry() {
+        const loadEl = document.getElementById('loading');
+        loadEl.style.display = 'block';
+        document.getElementById('community-grid').innerHTML = '';
+        try {
+            const res = await fetch('https://api.github.com/repos/modding-community-com/register/contents/domains');
+            const files = await res.json();
+            const promises = files
+                .filter(f => f.name.endsWith('.json'))
+                .map(async f => {
+                    const r = await fetch('domains/' + f.name);
+                    return r.json();
+                });
+            allCommunities = await Promise.all(promises);
+            renderCommunities(allCommunities);
+        } catch {
+            loadEl.innerHTML = '<p style="color:var(--text-dim)">Unable to load registry. Check connection.</p>';
+        }
+    }
+
+    function renderCommunities(list) {
+        document.getElementById('loading').style.display = 'none';
+        const grid = document.getElementById('community-grid');
+        grid.innerHTML = '';
+
+        if (!list.length) {
+            grid.innerHTML = '<div class="empty-state"><strong>No results</strong><p>Try a different search term.</p></div>';
+            return;
         }
 
-        async function fetchRegistry(forceRefresh = false) {
-            const loadingEl = document.getElementById('loading');
-            loadingEl.style.display = 'block';
-            
-            try {
-                const listResponse = await fetch('https://api.github.com/repos/modding-community-com/register/contents/domains');
-                const files = await listResponse.json();
+        list.forEach(item => {
+            const sub = item.subdomain;
+            const display = item.display || sub;
 
-                const fetchPromises = files
-                    .filter(file => file.name.endsWith('.json'))
-                    .map(async file => {
-                        const res = await fetch(`domains/${file.name}`);
-                        return await res.json();
-                    });
+            const card = document.createElement('a');
+            card.className = 'community-card card';
+            card.href = `https://${sub}.modding-community.com`;
+            card.target = '_blank';
 
-                allCommunities = await Promise.all(fetchPromises);
-                renderCommunities(allCommunities);
-            } catch (e) {
-                loadingEl.textContent = "Unable to load registry. Check connection.";
-            }
-        }
+            const imgWrap = document.createElement('div');
+            imgWrap.className = 'card-img';
 
-        function renderCommunities(list) {
-            const grid = document.getElementById('community-grid');
-            document.getElementById('loading').style.display = 'none';
-            grid.innerHTML = '';
-
-            list.forEach(item => {
-                const sub = item.subdomain;
-                const display = item.display || sub;
-
-                const card = document.createElement('a');
-                card.className = 'community-card';
-                card.href = `https://${sub}.modding-community.com`;
-                card.target = "_blank";
-
-                const iconWrapper = document.createElement('div');
-                iconWrapper.className = 'community-icon-wrapper';
-                
-                const img = document.createElement('img');
-                img.className = 'community-icon';
-                const iconBase = `icons/${sub}`;
-                const exts = ['.webp', '.png', '.jpg', '.jpeg'];
-                let eIdx = 0;
-
-                img.src = iconBase + exts[eIdx];
-                img.onerror = () => {
-                    eIdx++;
-                    if (eIdx < exts.length) img.src = iconBase + exts[eIdx];
-                    else {
-                        img.style.display = 'none';
-                        const fallback = document.createElement('div');
-                        fallback.className = 'icon-fallback';
-                        fallback.textContent = display.charAt(0).toUpperCase();
-                        iconWrapper.appendChild(fallback);
-                    }
-                };
-                iconWrapper.appendChild(img);
-
-                const info = document.createElement('div');
-                info.className = 'community-info';
-                info.innerHTML = `
-                    <span class="community-display-name">${display}</span>
-                    <span class="community-subdomain">${sub}.modding-community.com</span>
-                `;
-
-                card.appendChild(iconWrapper);
-                card.appendChild(info);
-                grid.appendChild(card);
-            });
-        }
-
-        function filterCommunities() {
-            const query = document.getElementById('searchBar').value.toLowerCase();
-            const filtered = allCommunities.filter(c => 
-                (c.display && c.display.toLowerCase().includes(query)) || 
-                c.subdomain.toLowerCase().includes(query)
-            );
-            renderCommunities(filtered);
-        }
-
-        function updateJson() {
-            const disp = document.getElementById('disp-name').value || "My Community";
-            const sub = document.getElementById('sub-name').value || "subdomain";
-            const type = document.getElementById('rec-type').value;
-            const target = document.getElementById('target-val').value || "target.example.com";
-
-            const config = {
-                "subdomain": sub,
-                "type": type,
-                "target": target,
-                "display": disp
+            const img = document.createElement('img');
+            const exts = ['.webp', '.png', '.jpg', '.jpeg'];
+            let eIdx = 0;
+            img.src = `icons/${sub}${exts[eIdx]}`;
+            img.alt = display;
+            img.onerror = () => {
+                eIdx++;
+                if (eIdx < exts.length) { img.src = `icons/${sub}${exts[eIdx]}`; }
+                else {
+                    img.style.display = 'none';
+                    const fb = document.createElement('div');
+                    fb.className = 'card-fallback';
+                    fb.textContent = display.charAt(0).toUpperCase();
+                    imgWrap.appendChild(fb);
+                }
             };
+            imgWrap.appendChild(img);
 
-            document.getElementById('json-display').textContent = JSON.stringify(config, null, 4);
-            document.getElementById('filename-preview').textContent = sub + ".json";
+            const info = document.createElement('div');
+            info.className = 'card-info';
+            info.innerHTML = `<span class="card-name">${display}</span><span class="card-sub">${sub}.modding-community.com</span>`;
+
+            card.appendChild(imgWrap);
+            card.appendChild(info);
+            grid.appendChild(card);
+        });
+    }
+
+    function filterCommunities() {
+        const q = document.getElementById('searchBar').value.toLowerCase();
+        renderCommunities(allCommunities.filter(c =>
+            (c.display && c.display.toLowerCase().includes(q)) ||
+            c.subdomain.toLowerCase().includes(q)
+        ));
+    }
+
+    function updateJson() {
+        const sub  = document.getElementById('sub-name').value  || 'subdomain';
+        const disp = document.getElementById('disp-name').value || 'My Community';
+        const type = document.getElementById('rec-type').value;
+        const tgt  = document.getElementById('target-val').value || 'target.example.com';
+        document.getElementById('json-display').textContent = JSON.stringify({ subdomain: sub, type, target: tgt, display: disp }, null, 4);
+        document.getElementById('filename-preview').textContent = sub + '.json';
+    }
+
+    function downloadJson() {
+        const sub = document.getElementById('sub-name').value || 'subdomain';
+        const blob = new Blob([document.getElementById('json-display').textContent], { type: 'application/json' });
+        const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: sub + '.json' });
+        a.click();
+        URL.revokeObjectURL(a.href);
+    }
+
+    function copyJson() {
+        navigator.clipboard.writeText(document.getElementById('json-display').textContent).then(() => alert('Copied!'));
+    }
+
+    async function resolveDiscordCommunity(communityId) {
+        const url = `https://raw.githubusercontent.com/thunderstore-io/ecosystem-schema/master/games/data/${communityId}.yml`;
+        const res = await fetch(url);
+        if (!res.ok) throw new Error('Community not found in thunderstore\'s ecosystem schema.');
+        const text = await res.text();
+        let discord = null, displayName = communityId;
+        for (const line of text.split(/\r?\n/)) {
+            const t = line.trim();
+            if (t.startsWith('discordUrl:')) discord = t.replace('discordUrl:', '').trim().replace(/^["']|["']$/g, '');
+            if (t.startsWith('displayName:')) displayName = t.replace('displayName:', '').trim().replace(/^["']|["']$/g, '');
         }
+        if (!discord) throw new Error('No Discord link found for this community');
+        return { discord: new URL(discord).href, displayName };
+    }
 
-        function downloadJson() {
-            const sub = document.getElementById('sub-name').value || "subdomain";
-            const content = document.getElementById('json-display').textContent;
-            const blob = new Blob([content], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = sub + ".json";
-            a.click();
-            URL.revokeObjectURL(url);
+    function onDiscordInput() {
+        document.getElementById('feature-result').className = 'feature-result';
+        document.getElementById('feature-result').textContent = '';
+    }
+
+    async function tryDiscordRedirect() {
+        const id = document.getElementById('discord-input').value.trim().toLowerCase();
+        const resultEl = document.getElementById('feature-result');
+        if (!id) return;
+        resultEl.className = 'feature-result loading';
+        resultEl.textContent = 'Looking up ' + id + '...';
+        try {
+            const { discord, displayName } = await resolveDiscordCommunity(id);
+            resultEl.className = 'feature-result success';
+            resultEl.textContent = 'Found: ' + displayName + ' -> ' + discord;
+            setTimeout(() => { window.open(discord, '_blank'); }, 400);
+        } catch (err) {
+            resultEl.className = 'feature-result error';
+            resultEl.textContent = err.message;
         }
+    }
 
-        function copyJson() {
-            const content = document.getElementById('json-display').textContent;
-            navigator.clipboard.writeText(content).then(() => {
-                alert("JSON copied!");
-            });
+    async function checkHashRedirect() {
+        let community = null;
+        if (location.hash) community = location.hash.replace('#', '').trim();
+        if (!community) {
+            const params = new URLSearchParams(location.search);
+            community = params.get('community');
         }
+        if (!community) return;
 
-        updateJson();
-        fetchRegistry();
-    </script>
+        community = community.toLowerCase();
+        const overlay = document.getElementById('redirect-overlay');
+        const statusEl = document.getElementById('redirect-status');
+        overlay.classList.add('active');
+        statusEl.textContent = 'Loading ' + community + '...';
+
+        try {
+            const { discord, displayName } = await resolveDiscordCommunity(community);
+            statusEl.textContent = 'Redirecting to ' + displayName + '...';
+            setTimeout(() => { window.location.replace(discord); }, 500);
+        } catch (err) {
+            statusEl.textContent = err.message;
+        }
+    }
+
+    updateJson();
+    fetchRegistry();
+    checkHashRedirect();
+</script>
 </body>
 </html>
